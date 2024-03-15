@@ -17,9 +17,7 @@
     {
       "path": "pages/index/index",
       "style": {
-        "navigationStyle": "custom",
-        "navigationBarTextStyle": "white",
-        "navigationBarTitleText": "首页"
+        "navigationBarTitleText": "灵询问答 · 智慧领航"
       }
     },
     {
@@ -28,7 +26,6 @@
         "navigationBarTitleText": "我的"
       }
     },
-    
     {
       "path": "pages/dialogue/dialogue",
       "style": {
@@ -39,33 +36,30 @@
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "",
-    "navigationBarBackgroundColor": "#F8F8F8",
+    "navigationBarBackgroundColor": "#9bcdff",
     "backgroundColor": "#F8F8F8"
   },
   // 设置 TabBar
   "tabBar": {
-    "color": "#333",
-    "selectedColor": "#27ba9b",
-    "backgroundColor": "#fff",
-    "borderStyle": "white",
+    "selectedColor": "#55aaff",
     "list": [
       {
-        "text": "首页",
         "pagePath": "pages/index/index",
-        "iconPath": "static/tabs/home_default.png",
-        "selectedIconPath": "static/tabs/home_selected.png"
+        "text": "首页",
+        "iconPath": "static/images/首页.png",
+        "selectedIconPath": "static/images/首页.png"
       },
       {
-        "text": "AI问答",
         "pagePath": "pages/dialogue/dialogue",
-        "iconPath": "static/tabs/category_default.png",
-        "selectedIconPath": "static/tabs/category_selected.png"
+        "text": "AI",
+        "iconPath": "static/images/客服.png",
+        "selectedIconPath": "static/images/客服.png"
       },
       {
-        "text": "我的",
         "pagePath": "pages/my/my",
-        "iconPath": "static/tabs/user_default.png",
-        "selectedIconPath": "static/tabs/user_selected.png"
+        "text": "我的",
+        "iconPath": "static/images/我的.png",
+        "selectedIconPath": "static/images/我的.png"
       }
     ]
   }
