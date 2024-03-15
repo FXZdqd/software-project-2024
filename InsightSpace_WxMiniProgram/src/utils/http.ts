@@ -1,6 +1,7 @@
 import { useUserStore } from '@/stores/modules/user'
 
-const baseURL = 'https://pcapi-xiaotuxian-front-devtest.itheima.net'
+// const baseURL = 'https://pcapi-xiaotuxian-front-devtest.itheima.net'
+const baseURL = 'http://localhost:8000/app'
 
 // 添加拦截器
 const httpInterceptor = {
@@ -43,9 +44,7 @@ uni.addInterceptor('uploadFile', httpInterceptor)
 *    3.3 网络错误 -> 提示用户换网络
 */
 type Data<T> = {
-  code: number
-  msg: string
-  result: T
+  value: number,
 }
 // 2.2 添加类型，支持泛型
 export const http = <T>(options: UniApp.RequestOptions) => {

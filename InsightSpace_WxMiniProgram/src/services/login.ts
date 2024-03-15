@@ -1,9 +1,14 @@
 import { http } from '../utils/http'
 
-type LoginParams = {
+/* type LoginParams = {
   code: string
   encryptedData: string
   iv: string
+} */
+type LoginParams = {
+  username: string,
+  password: string,
+  is_admin: boolean,
 }
 
 /**
@@ -11,10 +16,17 @@ type LoginParams = {
  * @param data 请求参数
  * @returns 
  */
-export const postLoginWxMinAPI = (data: LoginParams) => {
+/* export const postLoginWxMinAPI = (data: LoginParams) => {
   return http({
     method: 'POST',
     url: '/login/wxMin',
+    data,
+  })
+} */
+export const postLoginWxMinAPI = (data: LoginParams) => {
+  return http({
+    method: 'POST',
+    url: '/login/',
     data,
   })
 }

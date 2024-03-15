@@ -2,15 +2,16 @@
 
 import { postLoginWxMinAPI } from '@/services/login'
 import { onLoad } from '@dcloudio/uni-app';
+import { ref } from 'vue';
 
-let code = ''
-onLoad(async()=>{
+/* let code = ''
+onLoad(async () => {
   const res = await wx.login()
   code = res.code
 })
 
 //获取用户手机号
-const onGetphonenumber: UniHelper.ButtonOnGetphonenumber = async(ev) =>{
+const onGetphonenumber: UniHelper.ButtonOnGetphonenumber = async (ev) => {
   const encryptedData = ev.detail!.encryptedData!
   const iv = ev.detail!.iv!
   const res = await postLoginWxMinAPI({
@@ -19,37 +20,85 @@ const onGetphonenumber: UniHelper.ButtonOnGetphonenumber = async(ev) =>{
     iv,
   })
   console.log(res);
+} */
+import { useUserStore } from '@/stores'
+const UserStore = useUserStore()
+
+const loginData = ref({
+  username: '',
+  password: '',
+  is_admin: false,
+})
+
+/* const rules = {
+  username: {
+    rules: [{
+      required: true,
+      errorMessage: '请输入用户名',
+      trigger: 'blur'
+    }, {
+      minLength: 5,
+      maxlength: 16,
+      errorMessage: '用户名长度在 {minLength} 到 {maxLength} 字符之间',
+      trigger: 'blur'
+    }]
+  },
+  passowrd: {
+    rules: [{
+      required: true,
+      errorMessage: '请输入密码',
+      trigger: 'blur'
+    }, {
+      minLength: 5,
+      maxlength: 16,
+      errorMessage: '密码长度在 {minLength} 到 {maxLength} 字符之间',
+      trigger: 'blur'
+    }]
+  }
+} */
+
+const submit = async () => {
+  //console.log(loginData.value);
+
+  let result = await postLoginWxMinAPI(loginData.value);
+  if (result.value === 0) {
+
+    console.log('登陆成功');
+    //把用户数据存在pinia中
+    UserStore.setProfile(loginData.value);
+    //跳转首页
+
+  } else if (result.value === 1) {
+    console.log('该用户不存在');
+
+  } else if (result.value === 2) {
+    console.log('用户名/密码/权限错误');
+
+  } else if (result.value === 3) {
+    console.log('该用户已被封禁');
+
+  }
 }
+
 </script>
 
 <template>
   <view class="viewport">
     <view class="logo">
-      <image
-        src="@/static/images/logo_icon.png"
-      ></image>
+      <image src="@/static/images/logo.png"></image>
     </view>
     <view class="login">
-      <!-- 网页端表单登录 -->
-      <!-- <input class="input" type="text" placeholder="请输入用户名/手机号码" /> -->
-      <!-- <input class="input" type="text" password placeholder="请输入密码" /> -->
-      <!-- <button class="button phone">登录</button> -->
-
-      <!-- 小程序端授权登录 -->
-      <button class="button phone" open-type="getPhoneNumber" @getphonenumber="onGetphonenumber">
-        <text class="icon icon-phone"></text>
-        手机号快捷登录
-      </button>
-      <view class="extra">
-        <view class="caption">
-          <text>其他登录方式</text>
-        </view>
-        <view class="options">
-          <!-- 通用模拟登录 -->
-          <button>
-            <text class="icon icon-phone">模拟快捷登录</text>
-          </button>
-        </view>
+      <!-- 账号密码登录 -->
+      <view class="login">
+        <uni-forms :modelValue="loginData">
+          <uni-forms-item label="用户名" name="username">
+            <uni-easyinput type="text" v-model="loginData.username" placeholder="请输入用户名" />
+          </uni-forms-item>
+          <uni-forms-item label="密码" name="password">
+            <uni-easyinput type="password" v-model="loginData.password" placeholder="请输入密码" />
+          </uni-forms-item>
+          <button @click="submit">Submit</button>
+        </uni-forms>
       </view>
       <view class="tips">登录/注册即视为你同意《服务条款》和《灵询隐私协议》</view>
     </view>
@@ -71,10 +120,11 @@ page {
 .logo {
   flex: 1;
   text-align: center;
+
   image {
-    width: 220rpx;
-    height: 220rpx;
-    margin-top: 15vh;
+    width: 330rpx;
+    height: 330rpx;
+    margin-top: 10vh;
   }
 }
 
@@ -103,6 +153,7 @@ page {
     font-size: 28rpx;
     border-radius: 72rpx;
     color: #fff;
+
     .icon {
       font-size: 40rpx;
       margin-right: 6rpx;
@@ -121,6 +172,7 @@ page {
   .extra {
     flex: 1;
     padding: 70rpx 70rpx 0;
+
     .caption {
       width: 440rpx;
       line-height: 1;
@@ -128,6 +180,7 @@ page {
       font-size: 26rpx;
       color: #999;
       position: relative;
+
       text {
         transform: translate(-40%);
         background-color: #fff;
@@ -142,6 +195,7 @@ page {
       justify-content: center;
       align-items: center;
       margin-top: 70rpx;
+
       button {
         padding: 0;
         background-color: transparent;
@@ -167,6 +221,7 @@ page {
         border-radius: 50%;
       }
     }
+
     .icon-weixin::before {
       border-color: #06c05f;
       color: #06c05f;
