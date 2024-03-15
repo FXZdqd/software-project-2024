@@ -1,16 +1,15 @@
 <script setup lang="ts">
-
 import { postLoginWxMinAPI } from '@/services/login'
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad } from '@dcloudio/uni-app'
 
 let code = ''
-onLoad(async()=>{
+onLoad(async () => {
   const res = await wx.login()
   code = res.code
 })
 
 //获取用户手机号
-const onGetphonenumber: UniHelper.ButtonOnGetphonenumber = async(ev) =>{
+const onGetphonenumber: UniHelper.ButtonOnGetphonenumber = async (ev) => {
   const encryptedData = ev.detail!.encryptedData!
   const iv = ev.detail!.iv!
   const res = await postLoginWxMinAPI({
@@ -18,16 +17,14 @@ const onGetphonenumber: UniHelper.ButtonOnGetphonenumber = async(ev) =>{
     encryptedData,
     iv,
   })
-  console.log(res);
+  console.log(res)
 }
 </script>
 
 <template>
   <view class="viewport">
     <view class="logo">
-      <image
-        src="@/static/images/logo_icon.png"
-      ></image>
+      <image src="@/static/images/logo_icon.png"></image>
     </view>
     <view class="login">
       <!-- 网页端表单登录 -->
