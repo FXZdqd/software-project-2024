@@ -1,10 +1,15 @@
 <script setup lang="ts">
-
 import { postLoginWxMinAPI } from '@/services/login'
+<<<<<<< HEAD
 import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue';
 
 /* let code = ''
+=======
+import { onLoad } from '@dcloudio/uni-app'
+
+let code = ''
+>>>>>>> 65e75a388728ab4a51c493fb81e9c81f00d883b2
 onLoad(async () => {
   const res = await wx.login()
   code = res.code
@@ -19,6 +24,7 @@ const onGetphonenumber: UniHelper.ButtonOnGetphonenumber = async (ev) => {
     encryptedData,
     iv,
   })
+<<<<<<< HEAD
   console.log(res);
 } */
 import { useUserStore } from '@/stores'
@@ -78,6 +84,9 @@ const submit = async () => {
     console.log('该用户已被封禁');
 
   }
+=======
+  console.log(res)
+>>>>>>> 65e75a388728ab4a51c493fb81e9c81f00d883b2
 }
 
 </script>
@@ -85,7 +94,11 @@ const submit = async () => {
 <template>
   <view class="viewport">
     <view class="logo">
+<<<<<<< HEAD
       <image src="@/static/images/logo.png"></image>
+=======
+      <image src="@/static/images/logo_icon.png"></image>
+>>>>>>> 65e75a388728ab4a51c493fb81e9c81f00d883b2
     </view>
     <view class="login">
       <!-- 账号密码登录 -->

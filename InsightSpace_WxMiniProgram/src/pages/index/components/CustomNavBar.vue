@@ -1,73 +1,35 @@
 <script setup lang="ts">
-
-const {safeAreaInsets} = uni.getSystemInfoSync()
-
+const { safeAreaInsets } = uni.getSystemInfoSync()
 </script>
 
 <template>
-  <view class="navbar" :style="{paddingTop:safeAreaInsets?.top + 'px'}">
-    <!-- logo文字 -->
-    <view class="logo">
-      <image class="logo-image" src="@/static/images/logo_horizontal.png"></image>
-      <text class="logo-text">灵询问答 · 智慧领航</text>
-    </view>
-    <!-- 搜索条 -->
-    <view class="search">
-      <text class="icon-search">搜索问题关键字</text>
-      <text class="icon-scan"></text>
-    </view>
+  <!-- 搜索条 -->
+  <view class="search">
+    <text class="icon-search">搜索问题关键字</text>
+    <text class="icon-scan"></text>
   </view>
 </template>
 
 <style lang="scss">
-/* 自定义导航条 */
-.navbar {
-  background-image: url(@/static/images/navigator_bg.png);
-  background-size: cover;
-  position: relative;
+.search {
   display: flex;
-  flex-direction: column;
-  padding-top: 25px;
-  .logo {
-    display: flex;
-    align-items: center;
-    height: 64rpx;
-    padding-left: 30rpx;
-    padding-top: 20rpx;
-    .logo-image {
-      width: 146rpx;
-      height: 78rpx;
-    }
-    .logo-text {
-      flex: 1;
-      line-height: 28rpx;
-      color: #fff;
-      margin: 2rpx 0 0 20rpx;
-      padding-left: 20rpx;
-      border-left: 1rpx solid #fff;
-      font-size: 26rpx;
-    }
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10rpx 0 26rpx;
+  height: 64rpx;
+  margin: 25rpx 20rpx;
+  color: #fff;
+  font-size: 28rpx;
+  border-radius: 32rpx;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+.icon-search {
+  &::before {
+    margin-right: 10rpx;
   }
-  .search {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 10rpx 0 26rpx;
-    height: 64rpx;
-    margin: 25rpx 20rpx;
-    color: #fff;
-    font-size: 28rpx;
-    border-radius: 32rpx;
-    background-color: rgba(255, 255, 255, 0.5);
-  }
-  .icon-search {
-    &::before {
-      margin-right: 10rpx;
-    }
-  }
-  .icon-scan {
-    font-size: 30rpx;
-    padding: 20rpx;
-  }
+}
+.icon-scan {
+  font-size: 30rpx;
+  padding: 20rpx;
 }
 </style>
