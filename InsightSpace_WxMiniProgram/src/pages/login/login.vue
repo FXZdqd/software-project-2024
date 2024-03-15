@@ -1,34 +1,24 @@
 <script setup lang="ts">
-import { postLoginWxMinAPI } from '@/services/login'
-import { onLoad } from '@dcloudio/uni-app';
+import { postLoginWxMinAPI, postRegisterWxMinAPI } from '@/services/user'
 import { ref } from 'vue';
 
-/* let code = ''
-onLoad(async () => {
-  const res = await wx.login()
-  code = res.code
-})
-
-//获取用户手机号
-const onGetphonenumber: UniHelper.ButtonOnGetphonenumber = async (ev) => {
-  const encryptedData = ev.detail!.encryptedData!
-  const iv = ev.detail!.iv!
-  const res = await postLoginWxMinAPI({
-    code,
-    encryptedData,
-    iv,
-  })
-  console.log(res);
-} */
 import { useUserStore } from '@/stores'
 const UserStore = useUserStore()
 
+const isRegister = ref(false)
 const loginData = ref({
   username: '',
   password: '',
   is_admin: false,
 })
+const registerData = ref({
+  username: '',
+  password: '',
+  rePassword: '',
+  is_admin: false,
+})
 
+//校验表单
 /* const rules = {
   username: {
     rules: [{
@@ -56,7 +46,8 @@ const loginData = ref({
   }
 } */
 
-const submit = async () => {
+//登录
+const login = async () => {
   //console.log(loginData.value);
 
   let result = await postLoginWxMinAPI(loginData.value);
@@ -79,6 +70,26 @@ const submit = async () => {
   }
 }
 
+const register = async () => {
+  let result = await postRegisterWxMinAPI(registerData.value);
+  if (result.value === 0) {
+    console.log('注册成功');
+    //回到登录页
+    isRegister.value = false;
+  }else if(result.value === 1){
+
+  }
+}
+
+const clearRegisterData = () => {
+  registerData.value = {
+    username: '',
+    password: '',
+    rePassword: '',
+    is_admin: false,
+  }
+}
+
 </script>
 
 <template>
@@ -86,22 +97,48 @@ const submit = async () => {
     <view class="logo">
       <image src="@/static/images/logo.png"></image>
     </view>
-    <view class="login">
-      <!-- 账号密码登录 -->
-      <view class="login">
-        <uni-forms :modelValue="loginData">
-          <uni-forms-item label="用户名" name="username">
-            <uni-easyinput type="text" v-model="loginData.username" placeholder="请输入用户名" />
-          </uni-forms-item>
-          <uni-forms-item label="密码" name="password">
-            <uni-easyinput type="password" v-model="loginData.password" placeholder="请输入密码" />
-          </uni-forms-item>
-          <button @click="submit">Submit</button>
-        </uni-forms>
-      </view>
-      <view class="tips">登录/注册即视为你同意《服务条款》和《灵询隐私协议》</view>
+    <!-- 注册表单 -->
+    <view class="register" v-if="isRegister">
+      <uni-forms :modelValue="registerData">
+        <uni-forms-item label="用户名" name="username">
+          <uni-easyinput type="text" v-model="registerData.username" placeholder="请输入用户名" />
+        </uni-forms-item>
+        <uni-forms-item label="密码" name="password">
+          <uni-easyinput type="password" v-model="registerData.password" placeholder="请输入密码" />
+        </uni-forms-item>
+        <uni-forms-item label="确认密码" name="rePassword">
+          <uni-easyinput type="password" v-model="registerData.rePassword" placeholder="请再次输入密码" />
+        </uni-forms-item>
+        <button @click="register" style="background-color:#d4e4ff">注册</button>
+        <view class="shift" :hover-start-time="1" @click="isRegister = false; clearRegisterData()">
+          <text>← 返回</text>
+        </view>
+      </uni-forms>
     </view>
+
+    <!-- 登录表单 -->
+    <view class="login" v-else>
+      <uni-forms :modelValue="loginData">
+        <uni-forms-item label="用户名" name="username">
+          <uni-easyinput type="text" v-model="loginData.username" placeholder="请输入用户名" />
+        </uni-forms-item>
+        <uni-forms-item label="密码" name="password">
+          <uni-easyinput type="password" v-model="loginData.password" placeholder="请输入密码" />
+        </uni-forms-item>
+        <button @click="login" style="background-color:#d4e4ff">登录</button>
+        <view class="shift" @click="isRegister = true; clearRegisterData();">
+          <text>
+            还没有账号？ 去注册 →
+          </text>
+        </view>
+      </uni-forms>
+    </view>
+
+    <view class="tips">登录/注册即视为你同意《服务条款》和《灵询隐私协议》</view>
   </view>
+
+
+
 </template>
 
 <style lang="scss">
@@ -126,6 +163,10 @@ page {
     margin-top: 10vh;
   }
 }
+
+/* .button {
+  color: #94bcff;
+} */
 
 .login {
   display: flex;
@@ -157,15 +198,6 @@ page {
       font-size: 40rpx;
       margin-right: 6rpx;
     }
-  }
-
-  .phone {
-    //background-color: #28bb9c;
-    background-color: rgba(0, 162, 255, 0.758);
-  }
-
-  .wechat {
-    background-color: #06c05f;
   }
 
   .extra {
@@ -228,6 +260,13 @@ page {
   }
 }
 
+.register {
+  display: flex;
+  flex-direction: column;
+  height: 60vh;
+  padding: 40rpx 20rpx 20rpx;
+}
+
 .tips {
   position: absolute;
   bottom: 80rpx;
@@ -237,4 +276,15 @@ page {
   color: #999;
   text-align: center;
 }
-</style>
+
+.shift {
+  margin-top: 10px;
+  text-align: center;
+  color: #999;
+  font-size: 30rpx;
+
+  text:hover {
+    color: aqua;
+  }
+}
+</style>@/services/user

@@ -10,6 +10,12 @@ type LoginParams = {
   password: string,
   is_admin: boolean,
 }
+type RegisterParams = {
+  username: string,
+  password: string,
+  rePassword: string,
+  is_admin: boolean,
+}
 
 /**
  * 小程序登录
@@ -27,6 +33,13 @@ export const postLoginWxMinAPI = (data: LoginParams) => {
   return http({
     method: 'POST',
     url: '/login/',
+    data,
+  })
+}
+export const postRegisterWxMinAPI = (data: RegisterParams) => {
+  return http({
+    method: 'POST',
+    url: '/register/',
     data,
   })
 }

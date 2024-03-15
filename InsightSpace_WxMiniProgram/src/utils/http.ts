@@ -1,6 +1,5 @@
 import { useUserStore } from '@/stores/modules/user'
 
-// const baseURL = 'https://pcapi-xiaotuxian-front-devtest.itheima.net'
 const baseURL = 'http://localhost:8000/app'
 
 // 添加拦截器
@@ -53,7 +52,7 @@ export const http = <T>(options: UniApp.RequestOptions) => {
       ...options,
       // 响应成功
       success(res) {
-        // 状态码 2xx， axios 就是这样设计的
+        // 状态码 2xx
         if (res.statusCode >= 200 && res.statusCode < 300) {
           // 2.1 提取核心数据 res.data
           resolve(res.data as Data<T>)
@@ -67,7 +66,7 @@ export const http = <T>(options: UniApp.RequestOptions) => {
           // 其他错误 -> 根据后端错误信息轻提示
           uni.showToast({
             icon: 'none',
-            title: (res.data as Data<T>).msg || '请求错误',
+            title: '请求错误',
           })
           reject(res)
         }
