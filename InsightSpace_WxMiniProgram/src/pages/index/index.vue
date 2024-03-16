@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import CustomNavBar from './components/CustomNavBar.vue'
+import CategoryPanel from './components/CategoryPanel.vue'
 </script>
 
 <template>
+  <CustomNavBar />
+  <swiper class="banner">
+    <swiper-item>
+      <image src="@/static/images/ad1.png"></image>
+    </swiper-item>
+  </swiper>
+  <CategoryPanel />
   <view class="index">
-    <swiper class="banner">
-      <swiper-item>
-        <image src="@/static/images/ad1.png"></image>
-      </swiper-item>
-    </swiper>
-
-    <uni-search-bar :focus="true"> </uni-search-bar>
     <uni-card
       title="问题"
       sub-title="标签"
@@ -66,6 +67,6 @@ import CustomNavBar from './components/CustomNavBar.vue'
 .banner,
 .banner image {
   width: 450px;
-  height: 200px;
+  height: 180px;
 }
 </style>

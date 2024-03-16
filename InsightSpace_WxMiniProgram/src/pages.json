@@ -17,6 +17,8 @@
     {
       "path": "pages/index/index",
       "style": {
+        "navigationStyle": "custom", // 隐藏默认导航
+        "navigationBarTextStyle": "white",
         "navigationBarTitleText": "灵询问答 · 智慧领航"
       }
     },

@@ -1,35 +1,67 @@
 <script setup lang="ts">
+// 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 </script>
 
 <template>
-  <!-- 搜索条 -->
-  <view class="search">
-    <text class="icon-search">搜索问题关键字</text>
-    <text class="icon-scan"></text>
+  <view class="navbar" :style="{ paddingTop: safeAreaInsets?.top + 'px' }">
+    <!-- logo文字 -->
+    <view class="logo">
+      <image class="logo-image" src="@/static/images/logo.png"></image>
+      <text class="logo-text">灵询问答 · 智慧领航</text>
+    </view>
+    <!-- 搜索条 -->
+    <view class="search">
+      <text class="icon-search">搜索问答</text>
+    </view>
   </view>
 </template>
 
 <style lang="scss">
-.search {
+/* 自定义导航条 */
+.navbar {
+  background-image: url(@/static/images/navigate_bg.jpg);
+  background-size: cover;
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 10rpx 0 26rpx;
-  height: 64rpx;
-  margin: 25rpx 20rpx;
-  color: #fff;
-  font-size: 28rpx;
-  border-radius: 32rpx;
-  background-color: rgba(255, 255, 255, 0.5);
-}
-.icon-search {
-  &::before {
-    margin-right: 10rpx;
+  flex-direction: column;
+  padding-top: 20px;
+  .logo {
+    display: flex;
+    align-items: center;
+    height: 64rpx;
+    padding-left: 30rpx;
+    padding-top: 20rpx;
+    .logo-image {
+      width: 90rpx;
+      height: 80rpx;
+    }
+    .logo-text {
+      flex: 1;
+      line-height: 28rpx;
+      color: #fff;
+      margin: 2rpx 0 0 20rpx;
+      padding-left: 20rpx;
+      border-left: 1rpx solid #fff;
+      font-size: 26rpx;
+    }
   }
-}
-.icon-scan {
-  font-size: 30rpx;
-  padding: 20rpx;
+  .search {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10rpx 0 26rpx;
+    height: 64rpx;
+    margin: 20rpx 20rpx;
+    color: #fff;
+    font-size: 28rpx;
+    border-radius: 32rpx;
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+  .icon-search {
+    &::before {
+      margin-right: 10rpx;
+    }
+  }
 }
 </style>
