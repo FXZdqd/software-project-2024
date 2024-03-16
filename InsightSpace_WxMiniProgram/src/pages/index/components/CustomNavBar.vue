@@ -20,7 +20,7 @@ const { safeAreaInsets } = uni.getSystemInfoSync()
 <style lang="scss">
 /* 自定义导航条 */
 .navbar {
-  background-image: url(@/static/images/navigate_bg.jpg);
+  background-image: url(@/static/images/navigate.png);
   background-size: cover;
   position: relative;
   display: flex;
@@ -39,10 +39,10 @@ const { safeAreaInsets } = uni.getSystemInfoSync()
     .logo-text {
       flex: 1;
       line-height: 28rpx;
-      color: #fff;
+      color: #0b0b0b;
       margin: 2rpx 0 0 20rpx;
       padding-left: 20rpx;
-      border-left: 1rpx solid #fff;
+      border-left: 1rpx solid #0b0b0b;
       font-size: 26rpx;
     }
   }
@@ -53,7 +53,7 @@ const { safeAreaInsets } = uni.getSystemInfoSync()
     padding: 0 10rpx 0 26rpx;
     height: 64rpx;
     margin: 20rpx 20rpx;
-    color: #fff;
+    color: #0b0b0b;
     font-size: 28rpx;
     border-radius: 32rpx;
     background-color: rgba(255, 255, 255, 0.5);
