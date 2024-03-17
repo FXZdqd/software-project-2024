@@ -58,7 +58,7 @@ const errorCode = ref(0);
 
 const login = async () => {
   try {
-    const response = await axios.post('http://localhost:8000/api/login/', {
+    const response = await axios.post('http://localhost:8000/api/login', {
       username: username.value,
       password: password.value,
       is_admin: true

@@ -1,7 +1,40 @@
 from rest_framework.views import APIView, Request
 from rest_framework.response import Response
 from app.models import *
-
+def check_username(username):
+    value = 0
+    try:
+        User.objects.get(username=username)
+    except User.DoesNotExist:
+        value = 1
+        try:
+            User.objects.get(username=username)
+        except User.DoesNotExist:
+            value = 2
+    return value == 2
+class Register(APIView):
+    def post(self, request):
+        data = request.data
+        phone = data.get('phone')
+        name = str(data.get('username'))
+        password = str(data.get('password'))
+        password_re = str(data.get('password_re'))
+        if not check_username(name):
+            return Response({"value": 3})  # 此用户名已被注册
+        if password != password_re:
+            return Response({"value": 2})  # 两次密码不一致
+        try:
+            u = User.objects.create(
+                username=name,
+                password=password,
+                phone=phone,
+                is_admin=False
+            )
+            u.save()
+        except Exception as e:
+            print(e)
+            return Response({"value": 1})  # 注册失败，请联系管理员
+        return Response({"value": 0})
 
 class Login(APIView):
     def post(self, request):

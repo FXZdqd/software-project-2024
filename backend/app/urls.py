@@ -10,5 +10,6 @@ router = DefaultRouter()
 router.register(prefix='user', viewset=view_set.UserViewSet)
 
 urlpatterns = [
-    path('login/', account.Login.as_view()),
+    path('login', account.Login.as_view()),
+    path('register',account.Register.as_view())
 ]
