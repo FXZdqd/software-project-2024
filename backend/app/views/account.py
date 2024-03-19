@@ -61,7 +61,7 @@ class Login(APIView):
         if value == 0:
             if password != item.password or is_admin > item.is_admin:
                 value = 2  # 密码错误或权限错误
-            elif item.isBaned:
+            elif item.is_baned:
                 value = 3
             else:
                 # 成功登录
