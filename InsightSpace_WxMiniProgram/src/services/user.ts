@@ -13,8 +13,8 @@ type LoginParams = {
 type RegisterParams = {
   username: string,
   password: string,
-  rePassword: string,
-  is_admin: boolean,
+  password_re: string,
+  phone: number
 }
 
 /**
@@ -32,14 +32,14 @@ type RegisterParams = {
 export const postLoginWxMinAPI = (data: LoginParams) => {
   return http({
     method: 'POST',
-    url: '/login/',
+    url: '/login',
     data,
   })
 }
 export const postRegisterWxMinAPI = (data: RegisterParams) => {
   return http({
     method: 'POST',
-    url: '/register/',
+    url: '/register',
     data,
   })
 }

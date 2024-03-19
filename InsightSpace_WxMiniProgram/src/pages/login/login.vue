@@ -14,8 +14,8 @@ const loginData = ref({
 const registerData = ref({
   username: '',
   password: '',
-  rePassword: '',
-  is_admin: false,
+  password_re: '',
+  phone: undefined
 })
 
 //校验表单
@@ -56,37 +56,86 @@ const login = async () => {
     console.log('登陆成功');
     //把用户数据存在pinia中
     UserStore.setProfile(loginData.value);
-    //跳转首页
 
+    //跳转首页
+    uni.switchTab({
+      url: '/pages/index/index'
+    });
+    uni.showToast({
+      title: '登陆成功'
+    });
   } else if (result.value === 1) {
     console.log('该用户不存在');
-
+    uni.showToast({
+      icon: 'error',
+      title: '该用户不存在'
+    });
+    clearLoginData();
   } else if (result.value === 2) {
     console.log('用户名/密码/权限错误');
-
+    uni.showToast({
+      icon: 'none',
+      title: '用户名/密码错误'
+    });
+    clearLoginData();
   } else if (result.value === 3) {
     console.log('该用户已被封禁');
-
+    uni.showToast({
+      icon: 'error',
+      title: '该用户已被封禁'
+    });
+    clearLoginData();
   }
 }
 
 const register = async () => {
+  console.log(registerData.value);
+  
   let result = await postRegisterWxMinAPI(registerData.value);
   if (result.value === 0) {
     console.log('注册成功');
+    uni.showToast({
+      title: '注册成功请登录'
+    });
     //回到登录页
+    clearRegisterData();
     isRegister.value = false;
-  }else if(result.value === 1){
-
+  } else if (result.value === 1) {
+    uni.showToast({
+      icon: 'error',
+      title: '注册失败'
+    });
+    clearRegisterData();
+  }else if (result.value == 2){
+    uni.showToast({
+      icon: 'none',
+      title: '两次密码不一致'
+    });
+    clearRegisterData();
+  }else if(result.value == 3){
+    uni.showToast({
+      icon: 'none',
+      title: '此用户名已被注册'
+    });
+    clearRegisterData();
   }
 }
+
+const clearLoginData = () => {
+  loginData.value = {
+    username: '',
+    password: '',
+    is_admin: false,
+  }
+}
+
 
 const clearRegisterData = () => {
   registerData.value = {
     username: '',
     password: '',
-    rePassword: '',
-    is_admin: false,
+    password_re: '',
+    phone: undefined
   }
 }
 
@@ -103,11 +152,14 @@ const clearRegisterData = () => {
         <uni-forms-item label="用户名" name="username">
           <uni-easyinput type="text" v-model="registerData.username" placeholder="请输入用户名" />
         </uni-forms-item>
+        <uni-forms-item label="手机号" name="telephone">
+          <uni-easyinput type="text" v-model="registerData.phone" placeholder="请输入手机号" />
+        </uni-forms-item>
         <uni-forms-item label="密码" name="password">
           <uni-easyinput type="password" v-model="registerData.password" placeholder="请输入密码" />
         </uni-forms-item>
         <uni-forms-item label="确认密码" name="rePassword">
-          <uni-easyinput type="password" v-model="registerData.rePassword" placeholder="请再次输入密码" />
+          <uni-easyinput type="password" v-model="registerData.password_re" placeholder="请再次输入密码" />
         </uni-forms-item>
         <button @click="register" style="background-color:#d4e4ff">注册</button>
         <view class="shift" :hover-start-time="1" @click="isRegister = false; clearRegisterData()">
@@ -154,19 +206,15 @@ page {
 }
 
 .logo {
-  flex: 1;
   text-align: center;
 
   image {
     width: 330rpx;
     height: 330rpx;
-    margin-top: 10vh;
+    margin-top: 5vh;
   }
 }
 
-/* .button {
-  color: #94bcff;
-} */
 
 .login {
   display: flex;
