@@ -14,3 +14,19 @@ class User(models.Model):
     phone = models.IntegerField(blank=True, null=True)
     is_admin = models.BooleanField(default=False)
     is_baned = models.BooleanField(default=False)
+
+
+class Question(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.TextField(blank=True)
+    date = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    likes = models.IntegerField(default=0)
+    views = models.IntegerField(default=0)
+
+class Answer(models.Model):
+    content = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    likes = models.IntegerField(default=0)

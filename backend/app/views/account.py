@@ -12,6 +12,7 @@ def check_username(username):
         except User.DoesNotExist:
             value = 2
     return value == 2
+
 class Register(APIView):
     def post(self, request):
         data = request.data
