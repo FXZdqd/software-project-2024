@@ -16,7 +16,7 @@ def check_username(username):
 class Register(APIView):
     def post(self, request):
         data = request.data
-        phone = data.get('phone')
+        phone = str(data.get('phone'))
         name = str(data.get('username'))
         password = str(data.get('password'))
         password_re = str(data.get('password_re'))

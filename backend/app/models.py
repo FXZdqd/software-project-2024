@@ -11,7 +11,7 @@ class User(models.Model):
 
     username = models.CharField(max_length=NAME_LEN, primary_key=True)
     password = models.CharField(max_length=PASSWD_LEN)
-    phone = models.IntegerField(blank=True, null=True)
+    phone = models.CharField(max_length=PHONE_LEN+1)
     is_admin = models.BooleanField(default=False)
     is_baned = models.BooleanField(default=False)
 

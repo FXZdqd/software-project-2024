@@ -78,7 +78,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # 默认
         'USER': 'root',  # mysql的用户名
-        'PASSWORD': "Zhang030127",  # mysql的密码
+        'PASSWORD': "Zhang031027",  # mysql的密码
         'HOST': 'localhost',  # mysql的ip地址
         'PORT': 3306,  # mysql的端口
         'NAME': "lingxun"
@@ -122,7 +122,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "app", "static","/"),
+    os.path.join(BASE_DIR, "app", "static", "/"),
 )
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\', '/')

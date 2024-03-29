@@ -62,6 +62,7 @@ class DeleteQuestion(APIView):
         except Exception as e:
             print(e)
         return Response(value)
+
 class ChangeQuestion(APIView):
     def post(self, req: Request):
         data = req.data

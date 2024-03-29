@@ -12,7 +12,7 @@
       </nav>
     </header>
     <div class="content">
-      <div v-if="currentItem === '问题管理'">问题管理内容</div>
+      <Q v-if="currentItem === '问题管理'">问题管理内容</Q>
       <div v-if="currentItem === '用户管理'">用户管理内容</div>
       <div v-if="currentItem === '模型管理'">模型管理内容</div>
       <div v-if="currentItem === '休闲一刻'">休闲一刻内容</div>
@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import Q from './Q.vue';
 export default {
   name: 'AdminPanel',
   data() {
@@ -33,6 +34,9 @@ export default {
     setCurrentItem(item) {
       this.currentItem = item;
     }
+  },
+  components: {
+   Q
   }
 };
 </script>
