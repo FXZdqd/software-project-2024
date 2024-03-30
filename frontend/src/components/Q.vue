@@ -45,7 +45,7 @@ const activeNames = ref([]);
 
 onMounted(async () => {
   try {
-    const response = await axios.post('http://localhost:8000/api/getAllQuestion');
+    const response = await axios.post('http://39.109.126.173:39000/api/getAllQuestion');
     if (Array.isArray(response.data.allQuestion)) {
       questions.value = response.data.allQuestion.map(question => ({
         ...question,

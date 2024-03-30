@@ -4,7 +4,7 @@
       <img class="logo-svg" src="../assets/bz.svg" alt="Logo" />
       <div class="spacer"></div>
       <div class="login-container">
-        <h2>管理员登录</h2>
+        <h2 style="display: flex; justify-content: center; align-items: center;">管理员登录</h2>
         <div class="spacer"></div>
         <form @submit.prevent="login" class="login-form">
           <div class="form-group">
@@ -58,7 +58,7 @@ const errorCode = ref(0);
 
 const login = async () => {
   try {
-    const response = await axios.post('http://localhost:8000/api/login', {
+    const response = await axios.post('http://39.109.126.173:39000/api/login', {
       username: username.value,
       password: password.value,
       is_admin: true
