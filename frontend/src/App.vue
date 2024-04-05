@@ -1,9 +1,11 @@
-<!-- src/App.vue -->
+<script setup lang="ts">
+
+</script>
 
 <template>
-  <router-view />
+  <router-view></router-view>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
-</script>
+<style scoped>
+@import url("font/font.css");
+</style>
