@@ -56,11 +56,8 @@ const login = async () => {
     console.log('登陆成功');
     //把用户数据存在pinia中
     UserStore.setProfile(loginData.value);
-
     //跳转首页
-    uni.switchTab({
-      url: '/pages/index/index'
-    });
+    uni.switchTab({url: '/pages/index/index'});
     uni.showToast({
       title: '登陆成功'
     });

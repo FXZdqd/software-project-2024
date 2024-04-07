@@ -22,13 +22,6 @@ type RegisterParams = {
  * @param data 请求参数
  * @returns
  */
-/* export const postLoginWxMinAPI = (data: LoginParams) => {
-  return http({
-    method: 'POST',
-    url: '/login/wxMin',
-    data,
-  })
-} */
 export const postLoginWxMinAPI = (data: LoginParams) => {
   return http({
     method: 'POST',
@@ -36,6 +29,12 @@ export const postLoginWxMinAPI = (data: LoginParams) => {
     data,
   })
 }
+
+/**
+ * 注册
+ * @param data 
+ * @returns 
+ */
 export const postRegisterWxMinAPI = (data: RegisterParams) => {
   return http({
     method: 'POST',

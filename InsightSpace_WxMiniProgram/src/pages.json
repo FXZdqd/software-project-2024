@@ -29,7 +29,7 @@
       }
     },
     {
-      "path": "pages/edit/edit",
+      "path": "pages/question/question",
       "style": {
         "navigationBarTitleText": "提问"
       }
@@ -58,7 +58,7 @@
         "selectedIconPath": "static/images/首页.png"
       },
       {
-        "pagePath": "pages/edit/edit",
+        "pagePath": "pages/question/question",
         "text": "提问",
         "iconPath": "static/images/添加.png",
         "selectedIconPath": "static/images/添加.png"
