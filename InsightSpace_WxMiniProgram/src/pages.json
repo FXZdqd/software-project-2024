@@ -23,6 +23,13 @@
       }
     },
     {
+      //详情页
+      "path": "pages/detail/detail",
+      "style": {
+        "navigationBarTitleText": "详情"
+      }
+    },
+    {
       "path": "pages/my/my",
       "style": {
         "navigationBarTitleText": "我的"
