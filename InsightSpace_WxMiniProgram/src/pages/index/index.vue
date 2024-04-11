@@ -36,6 +36,17 @@ function isValidAllQuestionData(data: any): data is AllQuestionData {
   return typeof data === 'object' && Array.isArray(data.allQuestion)
 }
 
+function formatDate(dateString) {
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }
+  return new Date(dateString).toLocaleDateString(undefined, options)
+}
+
 const viewInfo = (index: any) => {
   //跳转详情页
   uni.navigateTo({ url: `/pages/detail/detail?q_id=${index}` })
@@ -70,7 +81,7 @@ getall()
   <CategoryPanel />
   <view class="index">
     <div v-for="question in questionlist.allQuestion" :key="question.q_id" @click="viewInfo(question.q_id)">
-      <uni-card :title="question.title" :sub-title="question.username" :extra="question.date">
+      <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
         <text>{{ question.content }}</text>
       </uni-card>
     </div>
