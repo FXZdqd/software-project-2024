@@ -101,3 +101,4 @@ class GetAllQuestions(APIView):
             "allQuestion": return_data
         })
 
+
