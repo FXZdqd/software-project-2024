@@ -5,6 +5,9 @@ type createQParams = {
   content: string
   username: string
 }
+type qidParams = {
+  q_id: number
+}
 /**
  * 提问，添加问题
  * @param data
@@ -21,5 +24,12 @@ export const getAllQAPI = () => {
   return http({
     method: 'POST',
     url: '/getAllQuestion',
+  })
+}
+export const getQAPI = (data: qidParams) => {
+  return http({
+    method: 'POST',
+    url: '/getQuestion',
+    data,
   })
 }

@@ -48,8 +48,12 @@ function formatDate(dateString) {
 }
 
 const viewInfo = (index: any) => {
+  // 将 q_id 存储在本地存储中
+  uni.setStorageSync('q_id', index);
+  // 跳转详情页
+  uni.navigateTo({ url: '/pages/detail/detail' });
   //跳转详情页
-  uni.navigateTo({ url: `/pages/detail/detail?q_id=${index}` })
+  //uni.navigateTo({ url: `/pages/detail/detail?q_id=${index}` })
 }
 /*
 const questionlist = ref<{ allQuestion: any[] }>({
