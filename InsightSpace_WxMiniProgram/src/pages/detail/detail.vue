@@ -107,7 +107,7 @@ const toggleReport = () => {
   })
 }
 
-// 假设这里有多条回答数据
+// 假设的多条回答数据
 const answers = ref([
   { content: '回答内容1ghdhyibfcedaszxcvnhjjknjmvcdzer', username: '用户名1' },
   { content: '回答内容2rzxrcgvhbjnmwserdrtfghbnjmvcdzxcvbnm', username: '用户名2' },
@@ -128,7 +128,6 @@ function formatDate(dateString) {
 </script>
 
 <style>
-/* 样式根据需要自行修改 */
 .user-info {
   display: flex;
   align-items: center;

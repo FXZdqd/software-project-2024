@@ -30,6 +30,20 @@
       }
     },
     {
+      //tag页
+      "path": "pages/tag/tag",
+      "style": {
+        "navigationBarTitleText": "分类内容"
+      }
+    },
+    {
+      //搜索页
+      "path": "pages/search/search",
+      "style": {
+        "navigationBarTitleText": "搜索"
+      }
+    },
+    {
       "path": "pages/my/my",
       "style": {
         "navigationStyle": "custom",

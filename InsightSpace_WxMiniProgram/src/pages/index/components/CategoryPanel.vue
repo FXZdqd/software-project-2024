@@ -7,17 +7,31 @@ const catelist = ref([
   { name: '升学', img: '../../../static/images/升学求学.png' },
   { name: '其他', img: '../../../static/images/其他.png' },
 ])
+const SeeTag = (name: string) => {
+  if (name === '课程') {
+    name = 'course'
+  } else if (name == '科研') {
+    name = 'research'
+  } else if (name == '竞赛') {
+    name = 'competition'
+  } else if (name == '其他') {
+    name = 'other'
+  } else if (name == '升学') {
+    name = 'further_study'
+  } else {
+    name = 'unkown tag'
+  }
+  uni.setStorageSync('tag_name', name)
+  uni.navigateTo({
+    url: `/pages/tag/tag`,
+  })
+}
 </script>
 
 <template>
   <view class="category">
-    <navigator
-      class="category-item"
-      hover-class="none"
-      url="/pages/index/index"
-      v-for="item in catelist"
-      :key="item.name"
-    >
+    <navigator class="category-item" hover-class="none" url="/pages/index/index" v-for="item in catelist"
+      :key="item.name" @click="SeeTag(item.name)">
       <image class="icon" :src="item.img"></image>
       <text class="text">{{ item.name }}</text>
     </navigator>
@@ -45,6 +59,7 @@ const catelist = ref([
       width: 60rpx;
       height: 60rpx;
     }
+
     .text {
       font-size: 26rpx;
       color: #666;

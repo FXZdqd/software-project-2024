@@ -38,6 +38,7 @@ const addQ = async () => {
       title: '发布成功',
     })
   } else if (result.value === 1) {
+    console.log('发布失败')
   }
 }
 

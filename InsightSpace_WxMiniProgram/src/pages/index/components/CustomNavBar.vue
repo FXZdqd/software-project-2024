@@ -1,6 +1,30 @@
 <script setup lang="ts">
 // 获取屏幕边界到安全区域距离
+import { ref } from 'vue'
+import { getKeywordQAPI } from '@/services/question'
 const { safeAreaInsets } = uni.getSystemInfoSync()
+const key = ref('')
+const confirm = (value: any) => {
+  console.log(value)
+  let valstr = value.value
+  console.log(valstr)
+  searchkeyword(valstr)
+}
+const searchkeyword = async (keyword: string) => {
+  // 调用搜索接口
+  const res = await getKeywordQAPI({
+    keyword: keyword,
+    sort_questions_by: 'likes',
+    sort_questions_order: 'asc',
+    sort_answers_by: 'likes',
+    sort_answers_order: 'asc',
+  })
+  console.log(res)
+
+}
+// const clicksearch = () => {
+//   uni.navigateTo({ url: '/pages/search/search' });
+// }
 </script>
 
 <template>
@@ -12,7 +36,8 @@ const { safeAreaInsets } = uni.getSystemInfoSync()
     </view>
     <!-- 搜索条 -->
     <view class="search">
-      <text class="icon-search">搜索问答</text>
+      <uni-search-bar v-model="key" radius="100" @confirm="confirm" placeholder="请输入搜索内容" clear-button="always">
+      </uni-search-bar>
     </view>
   </view>
 </template>
@@ -26,16 +51,19 @@ const { safeAreaInsets } = uni.getSystemInfoSync()
   display: flex;
   flex-direction: column;
   padding-top: 20px;
+
   .logo {
     display: flex;
     align-items: center;
     height: 64rpx;
     padding-left: 30rpx;
     padding-top: 20rpx;
+
     .logo-image {
       width: 90rpx;
       height: 80rpx;
     }
+
     .logo-text {
       flex: 1;
       line-height: 28rpx;
@@ -46,6 +74,7 @@ const { safeAreaInsets } = uni.getSystemInfoSync()
       font-size: 26rpx;
     }
   }
+
   .search {
     display: flex;
     align-items: center;
@@ -58,6 +87,7 @@ const { safeAreaInsets } = uni.getSystemInfoSync()
     border-radius: 32rpx;
     background-color: rgba(255, 255, 255, 0.5);
   }
+
   .icon-search {
     &::before {
       margin-right: 10rpx;
