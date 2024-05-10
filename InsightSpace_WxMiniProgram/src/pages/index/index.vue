@@ -2,39 +2,26 @@
 import CustomNavBar from './components/CustomNavBar.vue'
 import CategoryPanel from './components/CategoryPanel.vue'
 import { getAllQAPI } from '@/services/question'
-import { ref } from 'vue'
-interface AllQuestionData {
-  allQuestion: []
-}
+import { ref, onMounted } from 'vue'
+const questions = ref<any[]>([])
+onMounted(
+  async () => {
+    try {
+      const response = await getAllQAPI()
+      if (Array.isArray(response)) {
+        questions.value = response.map((question) => ({
+          ...question
+        }))
 
-// 假设 API 返回的数据类型为 unknown
-const questionlist = ref<AllQuestionData>({
-  allQuestion: [],
-})
-
-const getall = async () => {
-  try {
-    // 假设 getAllQAPI() 函数返回的数据类型为 unknown
-    const res = await getAllQAPI()
-
-    // 使用类型保护来判断数据类型
-    if (isValidAllQuestionData(res)) {
-      questionlist.value = res
-      console.log(questionlist.value)
-    } else {
-      console.error('Invalid data format')
+      } else {
+        questions.value = []
+      }
+    } catch (error) {
+      console.error('There was an error fetching the questions:', error)
     }
-  } catch (error) {
-    console.error('Error fetching data:', error)
-    // 处理错误
-  }
-}
-getall()
+  } //setInterval(, 5000)
+)
 
-// 自定义类型保护函数，判断是否符合 AllQuestionData 类型
-function isValidAllQuestionData(data: any): data is AllQuestionData {
-  return typeof data === 'object' && Array.isArray(data.allQuestion)
-}
 
 function formatDate(dateString) {
   const options = {
@@ -77,6 +64,7 @@ getall()
 
 <template>
   <CustomNavBar />
+
   <swiper class="banner">
     <swiper-item>
       <image src="@/static/images/ad1.png"></image>
@@ -84,7 +72,7 @@ getall()
   </swiper>
   <CategoryPanel />
   <view class="index">
-    <div v-for="question in questionlist.allQuestion" :key="question.q_id" @click="viewInfo(question.q_id)">
+    <div v-for="question in questions" :key="question.q_id" @click="viewInfo(question.q_id)">
       <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
         <text>{{ question.content }}</text>
       </uni-card>

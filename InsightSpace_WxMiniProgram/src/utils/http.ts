@@ -1,6 +1,6 @@
 import { useUserStore } from '@/stores/modules/user'
 
-const baseURL = 'http://39.109.126.173:39000/api'
+const baseURL = 'http://39.109.126.173:39001/api'
 
 // 添加拦截器
 const httpInterceptor = {

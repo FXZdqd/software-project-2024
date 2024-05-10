@@ -4,6 +4,7 @@
     <view class="user-info">
       <image class="avatar" src="../../../static/images/avatar0.png"></image>
       <text class="username">{{ question.username }}</text>
+      <text class="qdate">{{ question.date }}</text>
     </view>
 
     <!-- 问题内容 -->
@@ -13,9 +14,12 @@
     <!-- 问题内容 -->
     <view class="qcontent">
       <text>{{ question.content }}</text>
+      <button class="follow-btn">+关注</button>
+      <icon>
+        <image class="like-icon" :src="likeIconSrc" @tap="toggleLike"></image>
+        <image class="report-icon" src="../../../static/images/report.png" @tap="toggleReport"></image>
+      </icon>
     </view>
-    <b></b>
-    <text class="qdate">{{ question.date }}</text>
 
     <!-- 回答区域 -->
     <view class="answer-section">
@@ -28,12 +32,10 @@
         <text>{{ answer.content }}</text>
         <!-- 点赞和踩按钮 -->
         <view class="like-dislike">
-          <button @click="toggleLike">
-            <image src="../../../static/images/like.png" alt="Like" />
-          </button>
-          <button @click="dislike">
-            <image src="../../../static/images/dislike.png" alt="Dislike" />
-          </button>
+          <icon>
+            <image class="like-icon" :src="likeIconSrc" @tap="toggleLike"></image>
+            <image class="report-icon" src="../../../static/images/report.png" @tap="toggleReport"></image>
+          </icon>
         </view>
       </view>
     </view>
@@ -68,25 +70,48 @@ const getDetails = async () => {
 getDetails()
 
 const isLiked = ref(false)
-
+const likeIconSrc = ref('/static/images/like.png')
 const toggleLike = () => {
   isLiked.value = !isLiked.value
+  console.log(isLiked.value)
+  likeIconSrc.value = isLiked.value ? '/static/images/liked.png' : '/static/images/like.png'
+  console.log(likeIconSrc.value)
 }
 
-//const likeImage = ref('@/static/images/like.png')
-
-// 监听isLiked的变化，根据状态切换图片
-//watch(isLiked, (newValue) => {
-//  likeImage.value = newValue ? '@/static/images/like.png' : '@/static/images/liked.png'
-//})
-
-const dislike = () => {
-  // 处理踩逻辑
+const toggleReport = () => {
+  //弹出一个dialog
+  uni.showModal({
+    title: '举报',
+    content: '确定要举报吗？',
+    success: function (res) {
+      if (res.confirm) {
+        //弹出一个表单，用户填写举报理由，输入框至少两行
+        uni.showModal({
+          title: '举报理由',
+          content: '请填写举报理由',
+          editable: true,
+          success: function (res) {
+            if (res.confirm) {
+              //用户点击确定，提交举报理由
+              console.log('用户提交了举报理由：', res.content)
+            } else if (res.cancel) {
+              console.log('用户点击取消')
+            }
+          },
+        })
+        console.log('用户点击确定')
+      } else if (res.cancel) {
+        console.log('用户点击取消')
+      }
+    },
+  })
 }
+
 // 假设这里有多条回答数据
 const answers = ref([
-  { content: '回答内容1' },
-  { content: '回答内容2' },
+  { content: '回答内容1ghdhyibfcedaszxcvnhjjknjmvcdzer', username: '用户名1' },
+  { content: '回答内容2rzxrcgvhbjnmwserdrtfghbnjmvcdzxcvbnm', username: '用户名2' },
+  { content: '回答内容3dxtfcgvhbjnnjhbvgyzretrftyguiytretgvhbjnmvcdzxcvbnm', username: '用户名3' },
   // 其他回答数据
 ])
 
@@ -127,9 +152,17 @@ function formatDate(dateString) {
 }
 
 .like-icon {
-  width: 13px;
-  height: 13px;
+  width: 25px;
+  height: 25px;
   margin-right: 10px;
+  margin-left: 270px;
+}
+
+.report-icon {
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+  margin-left: 12px;
 }
 
 .icon-dislikebtn {}
@@ -162,7 +195,23 @@ function formatDate(dateString) {
 }
 
 .qdate {
+  font-size: 10px;
+  margin-left: 150px;
+}
+
+.follow-btn {
+  width: 16%;
+  height: 1%;
+  margin-right: 6%;
+
+  text-align: auto;
   font-size: 12px;
-  margin-left: 230px;
+  background-color: #eef5a7;
+  /* 按钮背景色 */
+  color: #070707;
+  /* 按钮文字颜色 */
+  padding: 1px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 </style>
