@@ -1,78 +1,59 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores'
+import { ref } from 'vue'
 const UserStore = useUserStore()
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
-// 订单选项
-const orderTypes = [
-  { type: 1, text: '待付款', icon: 'icon-currency' },
-  { type: 2, text: '待发货', icon: 'icon-gift' },
-  { type: 3, text: '待收货', icon: 'icon-check' },
-  { type: 4, text: '待评价', icon: 'icon-comment' },
-]
-
+const current = ref(0)
+const onClickItem = (e) => {
+  if (current.value !== e.currentIndex) {
+    current.value = e.currentIndex
+  }
+}
+const items = ['我的提问', '我的回答', '我的关注']
+//获取会员信息
+const userStore = useUserStore()
 </script>
 
 <template>
   <scroll-view class="viewport" scroll-y enable-back-to-top>
+    <image class="background-image" src="/static/images/my_bg.jpg" mode="aspectFill" />
     <!-- 个人资料 -->
     <view class="profile" :style="{ paddingTop: safeAreaInsets!.top + 'px' }">
       <!-- 情况1：已登录 -->
-      <view class="overview" v-if="true">
+      <view class="overview">
         <navigator url="/pagesMember/profile/profile" hover-class="none">
-          <image class="avatar" mode="aspectFill"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/avatar_3.jpg"></image>
+          <image class="avatar" mode="aspectFill" :src="userStore.profile.avator"></image>
         </navigator>
         <view class="meta">
           <view class="nickname">{{ UserStore.profile.username }}</view>
-          <navigator class="extra" url="/pagesMember/profile/profile" hover-class="none">
-            <text class="update">更新头像昵称</text>
-          </navigator>
+          
         </view>
       </view>
-      <!-- 情况2：未登录 -->
-      <view class="overview" v-else>
-        <navigator url="/pages/login/login" hover-class="none">
-          <image class="avatar gray" mode="aspectFill"
-            src="http://yjy-xiaotuxian-dev.oss-cn-beijing.aliyuncs.com/picture/2021-04-06/db628d42-88a7-46e7-abb8-659448c33081.png">
-          </image>
-        </navigator>
-        <view class="meta">
-          <navigator url="/pages/login/login" hover-class="none" class="nickname">
-            未登录
-          </navigator>
-          <view class="extra">
-            <text class="tips">点击登录账号</text>
-          </view>
-        </view>
-      </view>
+
       <navigator class="settings" url="/pagesMember/settings/settings" hover-class="none">
-        设置
+        <image class="icon" src="/static/images/set.png" mode="aspectFill" />
+        <text class="settings-text">设置</text>
       </navigator>
     </view>
-    <!-- 我的订单 -->
-    <view class="orders">
-      <view class="title">
-        我的订单
-        <navigator class="navigator" url="/pagesOrder/list/list?type=0" hover-class="none">
-          查看全部订单<text class="icon-right"></text>
-        </navigator>
-      </view>
-      <view class="section">
-        <!-- 订单 -->
-        <navigator v-for="item in orderTypes" :key="item.type" :class="item.icon"
-          :url="`/pagesOrder/list/list?type=${item.type}`" class="navigator" hover-class="none">
-          {{ item.text }}
-        </navigator>
-        <!-- 客服 -->
-        <button class="contact icon-handset" open-type="contact">售后</button>
-      </view>
+    <!-- 分割线 -->  
+    <view class="uni-divider"></view> 
+
+    <view class="down">
+      <uni-section>
+        <!-- <view class="uni-padding-wrap uni-common-mt"> -->
+          <uni-segmented-control :current="current" :values="items" style-type=text @clickItem="onClickItem" />
+        <!-- </view> -->
+        <view class="content">
+          <view v-if="current === 0"><text class="content-text">我的提问</text></view>
+          <view v-if="current === 1"><text class="content-text">我的回答</text></view>
+          <view v-if="current === 2"><text class="content-text">我的关注</text></view>
+        </view>
+      </uni-section>
     </view>
-    <!-- 猜你喜欢 -->
-    <view class="guess">
-      <XtxGuess ref="guessRef" />
-    </view>
+
+
   </scroll-view>
 </template>
 
@@ -84,22 +65,32 @@ page {
 }
 
 .viewport {
+  position: relative;
+  width: 100%;
   height: 100%;
-  background-repeat: no-repeat;
-  background-image: url(https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/center_bg.png);
-  background-size: 100% auto;
+  overflow: hidden;
+
+}
+
+.background-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
 }
 
 /* 用户信息 */
 .profile {
-  margin-top: 20rpx;
+  margin-top: 100rpx;
+  margin-bottom: 30rpx;
   position: relative;
 
   .overview {
     display: flex;
-    height: 120rpx;
+    height: 170rpx;
     padding: 0 36rpx;
-    color: #fff;
   }
 
   .avatar {
@@ -121,15 +112,13 @@ page {
     line-height: 30rpx;
     padding: 16rpx 0;
     margin-left: 20rpx;
+    bottom: 0;
   }
 
   .nickname {
     max-width: 350rpx;
-    margin-bottom: 16rpx;
+    margin-bottom: 50rpx;
     font-size: 30rpx;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
@@ -142,78 +131,45 @@ page {
     font-size: 22rpx;
   }
 
-  .update {
+  /* .update {
     padding: 3rpx 10rpx 1rpx;
-    color: rgba(255, 255, 255, 0.8);
-    border: 1rpx solid rgba(255, 255, 255, 0.8);
+    color: rgba(0, 0, 0, 0.8);
+    border: 1rpx solid rgba(0, 0, 0, 0.8);
     margin-right: 10rpx;
     border-radius: 30rpx;
-  }
+    bottom: 0;
+  } */
 
   .settings {
     position: absolute;
     bottom: 0;
     right: 40rpx;
     font-size: 30rpx;
-    color: #fff;
   }
 }
-
-/* 我的订单 */
-.orders {
-  position: relative;
-  z-index: 99;
-  padding: 30rpx;
-  margin: 50rpx 20rpx 0;
-  background-color: #fff;
-  border-radius: 10rpx;
-  box-shadow: 0 4rpx 6rpx rgba(240, 240, 240, 0.6);
-
-  .title {
-    height: 40rpx;
-    line-height: 40rpx;
-    font-size: 28rpx;
-    color: #1e1e1e;
-
-    .navigator {
-      font-size: 24rpx;
-      color: #939393;
-      float: right;
-    }
-  }
-
-  .section {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    padding: 40rpx 20rpx 10rpx;
-
-    .navigator,
-    .contact {
-      text-align: center;
-      font-size: 24rpx;
-      color: #333;
-
-      &::before {
-        display: block;
-        font-size: 60rpx;
-        color: #ff9545;
-      }
-    }
-
-    .contact {
-      padding: 0;
-      margin: 0;
-      border: 0;
-      background-color: transparent;
-      line-height: inherit;
-    }
-  }
+.uni-divider {  
+    width: 100%; 
+    height: 10px;
+    background-color: #046d9b;  
+    //margin: 10px 0;   
+}
+.icon {
+  right:45rpx;
+  width: 50rpx;
+  height: 50rpx;
 }
 
-/* 猜你喜欢 */
-.guess {
-  background-color: #f7f7f8;
-  margin-top: 20rpx;
+.down {
+  border-radius: 50%;
+
+  .content {
+    margin-top: 30rpx;
+    justify-content: center;
+    align-items: center;
+    height: 1000rpx;
+  }
+
+
+
 }
 </style>
