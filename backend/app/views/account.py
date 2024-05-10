@@ -1,7 +1,42 @@
 from rest_framework.views import APIView, Request
 from rest_framework.response import Response
+from rest_framework import status
 from app.models import *
 
+
+class DeleteUser(APIView):
+    def delete(self, req: Request):
+        username = req.query_params.get('username')
+        if not username:
+            return Response({"error": "Missing 'username' parameter."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(username=username)
+            user.delete()
+            return Response({"message": f"User '{username}' deleted successfully."})
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class BanUser(APIView):
+    def post(self, req: Request):
+        username = req.data.get('username')
+        if not username:
+            return Response({"error": "Missing 'username' parameter."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(username=username)
+            if not user.is_banned:  # Check if the user is already banned
+                user.is_banned = True
+                user.save()
+                return Response({"message": f"User '{username}' has been successfully banned."})
+            else:
+                return Response({"message": f"User '{username}' is already banned."}, status=status.HTTP_409_CONFLICT)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def check_username(username):
     value = 0
@@ -86,7 +121,6 @@ class UpdateUsername(APIView):
         if not user:
             return Response({"value": 3})  # 用户不存在
 
-        # 检查新用户名是否已被其他账户使用
         if User.objects.exclude(pk=user.pk).filter(username=new_username).exists():
             return Response({"value": 2})  # 新用户名已被注册
 
@@ -108,7 +142,6 @@ class UpdatePassword(APIView):
         new_password = data.get('new_password')
         new_password_re = data.get('new_password_re')
 
-        # 查找用户对象
         user = User.objects.filter(username=username).first()
         if not user:
             return Response({"value": 3})  # 用户不存在
@@ -127,10 +160,13 @@ class UpdatePassword(APIView):
 
         return Response({"value": 0})  # 更新成功
 
+
+
+
 class GetAllUsers(APIView):
     def post(self, request):
         return_data = []
-        all_users = User.objects.all()  # 获取所有用户对象
+        all_users = User.objects.all()
         for user in all_users:
             return_data.append({
                 'user_id': user.id,
@@ -141,4 +177,67 @@ class GetAllUsers(APIView):
             })
         return Response({
             "allUsers": return_data
+        })
+
+
+import base64
+
+
+def changePicPath(path):
+    with open(path, "rb") as image_file:
+        # 读取文件
+        image_data = image_file.read()
+        # 对数据进行Base64编码
+        base64_encoded_data = base64.b64encode(image_data)
+        # 将Base64编码的数据转换为字符串
+        base64_message = base64_encoded_data.decode('utf-8')
+        return base64_message
+
+
+class SetAvatar(APIView):
+    def post(self, req: Request):
+        value = -1
+        avator_id = -1
+        file = req.FILES.get('photo')
+        try:
+            username = req.data['username']  # 得到用户名
+            user = User.objects.get(username=username)  # 查找用户对象
+            try:
+                item = Avator.objects.get(user=user)
+                item.file = file
+                item.save()
+                avator_id = item.id
+            except Avator.DoesNotExist:
+                pic = Avator.objects.create(
+                    file=file,
+                    user=user,
+                )
+                pic.save()
+                avator_id = pic.id
+            value = 0
+        except Exception as e:
+            print(e)
+            value = 1
+        return Response({
+            'value': value,
+            'avator_id': avator_id,
+        })
+
+
+class GetAvatar(APIView):
+    def post(self, req: Request):
+        username = req.data['username']
+        path = ''
+        try:
+            user = User.objects.get(username=username)
+            pic = Avator.objects.get(user=user)
+            path = pic.file.path
+            value = 0
+        except Exception as e:
+            print(e)
+            value = 1
+        return Response({
+            'value': value,
+            'path': path,
+            'base64': changePicPath(path)
         })

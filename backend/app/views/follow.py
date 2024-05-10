@@ -1,40 +1,38 @@
 from rest_framework.views import APIView, Request
 from rest_framework.response import Response
 from app.models import *
-
+import rest_framework.status
 class AddFollowQuestion(APIView):
     def post(self, request):
-        user_id = request.data.get('username')
+        username = request.data.get('username')
         question_id = request.data.get('q_id')
 
-        # 获取用户和问题实例
-        user = User.objects.filter(username=user_id).first()
+        user = User.objects.filter(username=username).first()
         question = Question.objects.filter(id=question_id).first()
         if not user or not question:
             return Response({'message': 'Invalid user or question'}, status=400)
 
-        # 检查是否已经关注过
-        if FollowedQuestion.objects.filter(user=user, question=question).exists():
+        if UserFollowedQuestion.objects.filter(user=user, question=question).exists():
             return Response({'message': 'Already followed'}, status=400)
 
-        # 创建关注关系
-        FollowedQuestion.objects.create(user=user, question=question)
+        UserFollowedQuestion.objects.create(user=user, question=question)
         return Response({'message': 'Question followed successfully'})
 
 
 class GetUserFollowedQuestions(APIView):
-    def get(self, request):
-        user_id = request.data.get('username')
-        user = User.objects.filter(username=user_id).first()
+    def post(self, request):
+        username = request.data.get('username')
+        print(username)
+        user = User.objects.filter(username=username).first()
         if not user:
-            return Response({'message': 'User not found'}, status=404)
+            return Response({'message': 'User not found'}, status=400)
 
-        followed_questions = user.followed_questions.all()
+        followed_questions = UserFollowedQuestion.objects.filter(user=user)
         data = [{
             'q_id': fq.question.id,
             'title': fq.question.title,
             'content': fq.question.content,
-            'date_followed': fq.date_followed
+            'date': fq.question.date
         } for fq in followed_questions]
 
         return Response(data)
