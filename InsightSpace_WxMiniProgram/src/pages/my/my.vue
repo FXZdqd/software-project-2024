@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores'
 import { ref } from 'vue'
+import { getFollowQAPI } from '@/services/question';
+import { getAvatarAPI } from '@/services/user'
 const UserStore = useUserStore()
+
+const FollowQ = ref<any[]>([])
+//获取会员信息
+const userStore = useUserStore()
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -9,11 +15,55 @@ const current = ref(0)
 const onClickItem = (e) => {
   if (current.value !== e.currentIndex) {
     current.value = e.currentIndex
+    if (current.value == 2) {
+      getFollowQ();
+    }
   }
 }
 const items = ['我的提问', '我的回答', '我的关注']
-//获取会员信息
-const userStore = useUserStore()
+
+
+const getFollowQ = async () => {
+  try {
+    const response = await getFollowQAPI({ username: UserStore.profile.username })
+    if (Array.isArray(response)) {
+      FollowQ.value = response.map((question) => ({
+        ...question
+      }))
+    } else {
+      FollowQ.value = []
+    }
+    console.log(FollowQ.value);
+  } catch (error) {
+    console.error('There was an error fetching the questions:', error)
+  }
+}
+
+const viewInfo = (index: any) => {
+  // 将 q_id 存储在本地存储中
+  uni.setStorageSync('q_id', index);
+  // 跳转详情页
+  uni.navigateTo({ url: '/pages/detail/detail' });
+}
+function formatDate(dateString) {
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }
+  return new Date(dateString).toLocaleDateString(undefined, options)
+}
+var photo = ref('')
+
+const getAvatar = async () => {
+  let data = await getAvatarAPI({ username: userStore.profile.username });
+  photo.value = data.base64;
+  //console.log("头像的base64格式：" + photo.value);
+}
+getAvatar();
+
 </script>
 
 <template>
@@ -21,14 +71,13 @@ const userStore = useUserStore()
     <image class="background-image" src="/static/images/my_bg.jpg" mode="aspectFill" />
     <!-- 个人资料 -->
     <view class="profile" :style="{ paddingTop: safeAreaInsets!.top + 'px' }">
-      <!-- 情况1：已登录 -->
+
       <view class="overview">
         <navigator url="/pagesMember/profile/profile" hover-class="none">
-          <image class="avatar" mode="aspectFill" :src="userStore.profile.avator"></image>
+          <image class="avatar" mode="aspectFill" :src="'data:image/jpeg;base64,' + photo"></image>
         </navigator>
         <view class="meta">
           <view class="nickname">{{ UserStore.profile.username }}</view>
-          
         </view>
       </view>
 
@@ -37,18 +86,26 @@ const userStore = useUserStore()
         <text class="settings-text">设置</text>
       </navigator>
     </view>
-    <!-- 分割线 -->  
-    <view class="uni-divider"></view> 
+    <!-- 分割线 -->
+    <!-- <view class="uni-divider" /> -->
 
     <view class="down">
       <uni-section>
-        <!-- <view class="uni-padding-wrap uni-common-mt"> -->
+        <view class="uni-padding-wrap uni-common-mt">
           <uni-segmented-control :current="current" :values="items" style-type=text @clickItem="onClickItem" />
-        <!-- </view> -->
+        </view>
         <view class="content">
           <view v-if="current === 0"><text class="content-text">我的提问</text></view>
           <view v-if="current === 1"><text class="content-text">我的回答</text></view>
-          <view v-if="current === 2"><text class="content-text">我的关注</text></view>
+          <view v-if="current === 2">
+            <view class="content-text">
+              <div v-for="question in FollowQ" :key="question.q_id" @click="viewInfo(question.q_id)">
+                <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
+                  <text>{{ question.content }}</text>
+                </uni-card>
+              </div>
+            </view>
+          </view>
         </view>
       </uni-section>
     </view>
@@ -79,6 +136,15 @@ page {
   width: 100%;
   height: 100%;
   z-index: -1;
+}
+
+.uni-common-mt {
+  margin-top: 0px;
+}
+
+.uni-padding-wrap {
+  // width: 750rpx;
+  padding: 0px 30px;
 }
 
 /* 用户信息 */
@@ -117,8 +183,8 @@ page {
 
   .nickname {
     max-width: 350rpx;
-    margin-bottom: 50rpx;
-    font-size: 30rpx;
+    margin-bottom: 30rpx;
+    font-size: 50rpx;
     white-space: nowrap;
   }
 
@@ -147,20 +213,23 @@ page {
     font-size: 30rpx;
   }
 }
-.uni-divider {  
-    width: 100%; 
-    height: 10px;
-    background-color: #046d9b;  
-    //margin: 10px 0;   
+
+.uni-divider {
+  width: 100%;
+  height: 5px;
+  background-color: #48c8ff;
+  //margin: 10px 0;   
 }
+
 .icon {
-  right:45rpx;
+  right: 45rpx;
   width: 50rpx;
   height: 50rpx;
 }
 
 .down {
   border-radius: 50%;
+  opacity: 0.8;
 
   .content {
     margin-top: 30rpx;

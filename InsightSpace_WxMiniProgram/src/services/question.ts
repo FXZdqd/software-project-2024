@@ -22,6 +22,10 @@ type keyParams = {
   sort_answers_by: string
   sort_answers_order: string
 }
+type usernameParams = {
+  username: string
+}
+
 /**
  * 提问，添加问题
  * @param data
@@ -58,6 +62,14 @@ export const getKeywordQAPI = (data: keyParams) => {
   return http({
     method: 'POST',
     url: '/getQuestionByKeyword',
+    data,
+  })
+}
+
+export const getFollowQAPI = (data: usernameParams) => { 
+  return http({
+    method: 'POST',
+    url: '/user_follow',
     data,
   })
 }

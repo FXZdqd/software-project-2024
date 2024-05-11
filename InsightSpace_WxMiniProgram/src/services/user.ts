@@ -16,6 +16,9 @@ type RegisterParams = {
   password_re: string,
   phone: number
 }
+type setAvatarParams = {
+  username: string
+}
 
 /**
  * 小程序登录
@@ -39,6 +42,14 @@ export const postRegisterWxMinAPI = (data: RegisterParams) => {
   return http({
     method: 'POST',
     url: '/register',
+    data,
+  })
+}
+
+export const getAvatarAPI = (data: setAvatarParams) => {
+  return http({
+    method: 'POST',
+    url: '/getAvatar',
     data,
   })
 }
