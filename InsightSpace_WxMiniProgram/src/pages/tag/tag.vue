@@ -54,6 +54,12 @@ function formatDate(dateString) {
     }
     return new Date(dateString).toLocaleDateString(undefined, options)
 }
+const viewInfo = (index) => {
+    // 将 q_id 存储在本地存储中
+    uni.setStorageSync('q_id', index);
+    // 跳转详情页
+    uni.navigateTo({ url: '/pages/detail/detail' });
+}
 </script>
 
 <style></style>

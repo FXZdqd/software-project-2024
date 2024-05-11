@@ -39,8 +39,6 @@ const viewInfo = (index: any) => {
   uni.setStorageSync('q_id', index);
   // 跳转详情页
   uni.navigateTo({ url: '/pages/detail/detail' });
-  //跳转详情页
-  //uni.navigateTo({ url: `/pages/detail/detail?q_id=${index}` })
 }
 /*
 const questionlist = ref<{ allQuestion: any[] }>({
