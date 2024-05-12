@@ -19,6 +19,11 @@ type RegisterParams = {
 type setAvatarParams = {
   username: string
 }
+type rePwd = {
+  username: string,
+  new_password: string,
+  new_password_re:string
+}
 
 /**
  * 小程序登录
@@ -50,6 +55,22 @@ export const getAvatarAPI = (data: setAvatarParams) => {
   return http({
     method: 'POST',
     url: '/getAvatar',
+    data,
+  })
+}
+
+export const setAvatarAPI = () => {
+
+}
+
+export const getUserProfileAPI = (data: setAvatarParams)=>{
+
+}
+
+export const resetPasswordAPI = (data: rePwd)=>{
+  return http({
+    method: 'POST',
+    url: '/resetPassword',
     data,
   })
 }

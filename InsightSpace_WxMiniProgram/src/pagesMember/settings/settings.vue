@@ -23,7 +23,7 @@ const onLogout = () => {
   <view class="viewport">
     <!-- 列表1 -->
     <view class="list" v-if="true">
-      <navigator url="/pagesMember/address/address" hover-class="none" class="item arrow">
+      <navigator url="/pagesMember/profile/profile" hover-class="none" class="item arrow">
         修改我的信息
       </navigator>
     </view>

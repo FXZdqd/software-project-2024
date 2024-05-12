@@ -20,8 +20,10 @@ const onClickItem = (e) => {
     }
   }
 }
-const items = ['我的提问', '我的回答', '我的关注']
 
+const scrollTop = ref(0);
+
+const items = ['我的提问', '我的回答', '我的关注']
 
 const getFollowQ = async () => {
   try {
@@ -45,7 +47,7 @@ const viewInfo = (index: any) => {
   // 跳转详情页
   uni.navigateTo({ url: '/pages/detail/detail' });
 }
-function formatDate(dateString) {
+function formatDate(dateString: any) {
   const options = {
     year: 'numeric',
     month: 'long',
@@ -59,15 +61,18 @@ var photo = ref('')
 
 const getAvatar = async () => {
   let data = await getAvatarAPI({ username: userStore.profile.username });
-  photo.value = data.base64;
-  //console.log("头像的base64格式：" + photo.value);
+  if (data.value == 0) {
+    photo.value = data.base64;
+  }
 }
 getAvatar();
+
 
 </script>
 
 <template>
-  <scroll-view class="viewport" scroll-y enable-back-to-top>
+  <view class="viewport">
+
     <image class="background-image" src="/static/images/my_bg.jpg" mode="aspectFill" />
     <!-- 个人资料 -->
     <view class="profile" :style="{ paddingTop: safeAreaInsets!.top + 'px' }">
@@ -83,50 +88,56 @@ getAvatar();
 
       <navigator class="settings" url="/pagesMember/settings/settings" hover-class="none">
         <image class="icon" src="/static/images/set.png" mode="aspectFill" />
-        <text class="settings-text">设置</text>
+        <!-- <text class="settings-text">设置</text> -->
       </navigator>
     </view>
     <!-- 分割线 -->
     <!-- <view class="uni-divider" /> -->
 
     <view class="down">
-      <uni-section>
-        <view class="uni-padding-wrap uni-common-mt">
-          <uni-segmented-control :current="current" :values="items" style-type=text @clickItem="onClickItem" />
-        </view>
-        <view class="content">
-          <view v-if="current === 0"><text class="content-text">我的提问</text></view>
-          <view v-if="current === 1"><text class="content-text">我的回答</text></view>
-          <view v-if="current === 2">
-            <view class="content-text">
-              <div v-for="question in FollowQ" :key="question.q_id" @click="viewInfo(question.q_id)">
-                <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
-                  <text>{{ question.content }}</text>
-                </uni-card>
-              </div>
+      <!-- <uni-section class="section"> -->
+      <view class="uni-divider" />
+      <view class="uni-padding-wrap uni-common-mt">
+        <uni-segmented-control :current="current" :values="items" style-type=text @clickItem="onClickItem" />
+      </view>
+      <view class="uni-divider" />
+      <view class="container">
+        <scroll-view class="scroll-view-container" :scroll-y="true" :scroll-top="scrollTop" >
+          <view class="content">
+            <view v-if="current === 0"><text class="content-text">我的提问</text></view>
+            <view v-if="current === 1"><text class="content-text">我的回答</text></view>
+            <view v-if="current === 2">
+              <view class="content-text">
+                <div v-for="question in FollowQ" :key="question.q_id" @click="viewInfo(question.q_id)">
+                  <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
+                    <text>{{ question.content }}</text>
+                  </uni-card>
+                </div>
+              </view>
             </view>
+
+            <view class="bottom">没有更多内容</view>
           </view>
-        </view>
-      </uni-section>
+        </scroll-view>
+      </view>
+
+      <!-- </uni-section> -->
     </view>
 
 
-  </scroll-view>
+  </view>
 </template>
 
 <style lang="scss">
 page {
   height: 100%;
-  overflow: hidden;
-  background-color: #f7f7f8;
+  background-color: #ffffff;
 }
 
 .viewport {
-  position: relative;
+  position: sticky;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-
 }
 
 .background-image {
@@ -140,17 +151,29 @@ page {
 
 .uni-common-mt {
   margin-top: 0px;
+  padding-top: 0px;
+  background-color: #ffffff;
 }
 
 .uni-padding-wrap {
   // width: 750rpx;
-  padding: 0px 30px;
+  padding: 0px 0px;
+}
+
+.scroll-view-container {
+  height: 450px;
+  border: 1px solid #ccc;
+  overflow-y: auto;
+}
+
+.top {
+  overflow: hidden;
 }
 
 /* 用户信息 */
 .profile {
   margin-top: 100rpx;
-  margin-bottom: 30rpx;
+  margin-bottom: 20rpx;
   position: relative;
 
   .overview {
@@ -183,7 +206,7 @@ page {
 
   .nickname {
     max-width: 350rpx;
-    margin-bottom: 30rpx;
+    margin-bottom: 35rpx;
     font-size: 50rpx;
     white-space: nowrap;
   }
@@ -216,9 +239,11 @@ page {
 
 .uni-divider {
   width: 100%;
-  height: 5px;
-  background-color: #48c8ff;
-  //margin: 10px 0;   
+  height: 7px;
+  background-color: #cbcbcb;
+  //margin: 10px 0;  
+  //margin-top: px;
+  overflow: visible;
 }
 
 .icon {
@@ -228,17 +253,24 @@ page {
 }
 
 .down {
-  border-radius: 50%;
   opacity: 0.8;
+  background-color: #ffffff;
+}
 
-  .content {
-    margin-top: 30rpx;
-    justify-content: center;
-    align-items: center;
-    height: 1000rpx;
-  }
+.content {
+  opacity: 1;
+  //margin-top: 30rpx;
 
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  //overflow-y: stroll;
+}
 
-
+.bottom {
+  text-align: center;
+  margin-top: 5px;
+  margin-bottom: 25px;
+  color: #b7b7b7
 }
 </style>
