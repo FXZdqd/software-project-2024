@@ -17,14 +17,33 @@ const onLogout = () => {
     },
   })
 }
+
+const cancel = () => {
+  uni.showModal({
+    title: '注销账号',
+    content: '一经注销，账号所有信息将被清空，无法恢复',
+    success: (res) => {
+      if (res.confirm) {
+        // 清理用户信息
+        userStore.clearProfile()
+        // 返回登录页
+        uni.reLaunch({ url: '/pages/login/login' });
+        uni.showToast({
+          title: '注销成功'
+        });
+      }
+    },
+  })
+}
+
 </script>
 
 <template>
   <view class="viewport">
     <!-- 列表1 -->
     <view class="list" v-if="true">
-      <navigator url="/pagesMember/profile/profile" hover-class="none" class="item arrow">
-        修改我的信息
+      <navigator url="/pagesMember/myProfile/myProfile" hover-class="none" class="item arrow">
+        我的信息
       </navigator>
     </view>
     <!-- 列表2 -->
@@ -40,6 +59,9 @@ const onLogout = () => {
     <!-- 操作按钮 -->
     <view class="action">
       <view class="button" @click="onLogout">退出登录</view>
+    </view>
+    <view class="action">
+      <view class="button" @click="cancel">注销账号</view>
     </view>
   </view>
 </template>
@@ -98,7 +120,6 @@ page {
   }
 }
 
-/* 操作按钮 */
 .action {
   text-align: center;
   line-height: 90rpx;

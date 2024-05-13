@@ -78,7 +78,7 @@ getAvatar();
     <view class="profile" :style="{ paddingTop: safeAreaInsets!.top + 'px' }">
 
       <view class="overview">
-        <navigator url="/pagesMember/profile/profile" hover-class="none">
+        <navigator url="/pagesMember/myProfile/myProfile" hover-class="none">
           <image class="avatar" mode="aspectFill" :src="'data:image/jpeg;base64,' + photo"></image>
         </navigator>
         <view class="meta">
@@ -102,7 +102,7 @@ getAvatar();
       </view>
       <view class="uni-divider" />
       <view class="container">
-        <scroll-view class="scroll-view-container" :scroll-y="true" :scroll-top="scrollTop" >
+        <scroll-view class="scroll-view-container" :scroll-y="true" :scroll-top="scrollTop">
           <view class="content">
             <view v-if="current === 0"><text class="content-text">我的提问</text></view>
             <view v-if="current === 1"><text class="content-text">我的回答</text></view>
@@ -240,7 +240,7 @@ page {
 .uni-divider {
   width: 100%;
   height: 7px;
-  background-color: #cbcbcb;
+  background-color: #d6d6d6;
   //margin: 10px 0;  
   //margin-top: px;
   overflow: visible;

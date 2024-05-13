@@ -110,7 +110,14 @@
 					}
 				},
 				{
-					"path": "profile/profile",
+					"path": "myProfile/myProfile",
+					"style": {
+						"navigationStyle": "custom",
+						"navigationBarTitleText": "我的信息"
+					}
+				},
+				{
+					"path": "otherProfile/otherProfile",
 					"style": {
             "navigationStyle": "custom",
 						"navigationBarTitleText": "个人信息"
