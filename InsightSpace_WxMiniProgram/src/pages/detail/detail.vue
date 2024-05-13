@@ -8,22 +8,41 @@
     </view>
 
     <!-- 问题内容 -->
+    <view class="qtitle">
+      <text>{{ question.title }}</text>
+    </view>
 
-    <text class="qtitle">{{ question.title }}</text>
     <b></b>
     <!-- 问题内容 -->
     <view class="qcontent">
       <text>{{ question.content }}</text>
-      <button class="follow-btn">+关注</button>
       <icon>
-        <image class="like-icon" :src="likeIconSrc" @tap="toggleLike"></image>
-        <image class="report-icon" src="../../../static/images/report.png" @tap="toggleReport"></image>
+        <image class="report-icon" src="/static/images/report1.png" @tap="toggleReportQ"></image>
+        <image class="like-icon" :src="likeIconSrc" @tap="toggleLikeQ"></image>
+        <image class="follow-icon" :src="followIconSrc" @tap="togglefollow"></image>
       </icon>
     </view>
-
+    <b></b>
+    <view>
+      <button class="button" type="primary" plain="true" @click="handleAnswer">
+        <text class="button-text">去回答</text>
+      </button>
+    </view>
+    <view>
+      <!-- 普通弹窗 -->
+      <uni-popup class="pop" ref="popup" background-color="#fff" type="bottom">
+        <view class="popup-content"><text class="text">我的回答</text>
+          <uni-forms-item>
+            <uni-easyinput type="textarea" v-model="myanswer" placeholder="请输入您的回答" />
+          </uni-forms-item>
+          <button type="primary" plain="true">发布</button>
+        </view>
+      </uni-popup>
+    </view>
+    <b></b>
     <!-- 回答区域 -->
     <view class="answer-section">
-      <view v-for="(answer, index) in answers" :key="index" class="answer">
+      <view v-for="(answer, index) in question.answers" :key="index" class="answer">
         <!-- 回答者头像和名称 -->
         <view class="user-info">
           <image class="avatar" src="../../../static/images/avatar1.png"></image>
@@ -33,8 +52,10 @@
         <!-- 点赞和踩按钮 -->
         <view class="like-dislike">
           <icon>
-            <image class="like-icon" :src="likeIconSrc" @tap="toggleLike"></image>
-            <image class="report-icon" src="../../../static/images/report.png" @tap="toggleReport"></image>
+            <image class="reportA-icon" src="/static/images/report1.png" @tap="toggleReportA(answer.a_id - 1)"></image>
+            <image class="likeA-icon" :src="answer.is_liked ? '/static/images/liked.png' : '/static/images/like.png'"
+              @tap="toggleLikeA(answer.a_id - 1)">
+            </image>
           </icon>
         </view>
       </view>
@@ -44,41 +65,151 @@
 
 <script setup>
 // 使用 setup 函数初始化数据
-import { ref, watch } from 'vue'
-import { getQAPI } from '@/services/question'
+import { ref, onMounted } from 'vue'
+import {
+  getQAPI,
+  followAPI,
+  likeQAPI,
+  unlikeQAPI,
+  likeAAPI,
+  unlikeAAPI,
+  reportQAPI,
+  reportAAPI,
+} from '@/services/question'
+import { useUserStore } from '@/stores'
+const popup = ref(null)
+const handleAnswer = () => {
+  popup.value.open()
+}
+const myanswer = ref('')
+const UserStore = useUserStore()
 // 获取 q_id
 let qid = uni.getStorageSync('q_id')
 console.log('q_id:', qid)
-const title = ref('')
-const content = ref('')
-const username = ref('')
-const date = ref('')
 const question = ref({
   title: '',
   content: '',
   username: '',
   date: '',
+  answers: [],
+  is_liked: Boolean,
+  is_followed: Boolean,
 })
 const getDetails = async () => {
-  const res = await getQAPI({ q_id: qid })
+  const res = await getQAPI({ q_id: qid, username: UserStore.profile.username })
   question.value.title = res.title
   question.value.content = res.content
   question.value.username = res.username
   question.value.date = formatDate(res.date)
+  question.value.answers = res.answers
+  question.value.is_liked = res.is_liked
+  question.value.is_followed = res.is_followed
   console.log(question.value)
+
+  if (question.value.is_liked) {
+    console.log('已点赞')
+    likeIconSrc.value = '/static/images/liked.png'
+  } else {
+    console.log('未点赞')
+    likeIconSrc.value = '/static/images/like.png'
+  }
+  if (question.value.is_followed) {
+    console.log('已收藏')
+    followIconSrc.value = '/static/images/followed.png'
+  } else {
+    console.log('未收藏')
+    followIconSrc.value = '/static/images/follow.png'
+  }
 }
 getDetails()
 
-const isLiked = ref(false)
 const likeIconSrc = ref('/static/images/like.png')
-const toggleLike = () => {
-  isLiked.value = !isLiked.value
-  console.log(isLiked.value)
-  likeIconSrc.value = isLiked.value ? '/static/images/liked.png' : '/static/images/like.png'
-  console.log(likeIconSrc.value)
+const followIconSrc = ref('/static/images/follow.png')
+const reportIconSrc = ref('/static/images/report1.png')
+const reportIconSrcA = [5]
+for (let i = 0; i < question.value.answers.length; i++) {
+  reportIconSrcA.push('/static/images/report1.png')
+}
+const likeIconSrcA = [5]
+for (let i = 0; i < question.value.answers.length; i++) {
+  likeIconSrcA.push('/static/images/like.png')
+}
+const toggleLikeQ = () => {
+  console.log('1', question.value.is_liked)
+  if (question.value.is_liked) {
+    //取消点赞
+    unlikeQ()
+    question.value.is_liked = false
+  } else {
+    //点赞
+    likeQ()
+    question.value.is_liked = true
+  }
+  likeIconSrc.value = question.value.is_liked
+    ? '/static/images/liked.png'
+    : '/static/images/like.png'
+  console.log('2', likeIconSrc.value)
 }
 
-const toggleReport = () => {
+const toggleLikeA = (id) => {
+  console.log('处理回答id的点赞功能:', id)
+  if (question.value.answers[id].is_liked) {
+    //取消点赞
+    unlikeA(id + 1)
+    question.value.answers[id].is_liked = false
+  } else {
+    //点赞
+    likeA(id + 1)
+    question.value.answers[id].is_liked = true
+  }
+}
+
+const togglefollow = () => {
+  console.log(question.value.answers.is_followed)
+  if (question.value.is_followed) {
+    console.log('取消关注')
+  } else {
+    followQ()
+    question.value.answers.is_followed = true
+  }
+  followIconSrc.value = question.value.is_followed
+    ? '/static/images/followed.png'
+    : '/static/images/follow.png'
+  console.log(followIconSrc.value)
+}
+const likeQ = async () => {
+  console.log('执行点赞')
+  const res = await likeQAPI({ q_id: qid, username: UserStore.profile.username })
+  console.log(res)
+}
+const unlikeQ = async () => {
+  console.log('取消点赞')
+  const res = await unlikeQAPI({ q_id: qid, username: UserStore.profile.username })
+  console.log(res)
+}
+
+const likeA = async (id) => {
+  const res = await likeAAPI({ a_id: id, username: UserStore.profile.username })
+  console.log(res)
+}
+const unlikeA = async (id) => {
+  const res = await unlikeAAPI({ a_id: id, username: UserStore.profile.username })
+  console.log(res)
+}
+const followQ = async () => {
+  const res = await followAPI({ q_id: qid, username: UserStore.profile.username })
+  console.log(res)
+}
+const reportQ = async () => {
+  const res = await reportQAPI({ q_id: qid })
+  console.log(res)
+}
+const reportA = async (id) => {
+  const res = await reportAAPI({ a_id: id })
+  console.log(res)
+}
+
+const toggleReportQ = () => {
   //弹出一个dialog
   uni.showModal({
     title: '举报',
@@ -88,12 +219,16 @@ const toggleReport = () => {
         //弹出一个表单，用户填写举报理由，输入框至少两行
         uni.showModal({
           title: '举报理由',
-          content: '请填写举报理由',
+          content: '',
           editable: true,
           success: function (res) {
             if (res.confirm) {
-              //用户点击确定，提交举报理由
               console.log('用户提交了举报理由：', res.content)
+              reportQ()
+              uni.showToast({
+                icon: 'success',
+                title: '举报成功',
+              })
             } else if (res.cancel) {
               console.log('用户点击取消')
             }
@@ -107,13 +242,39 @@ const toggleReport = () => {
   })
 }
 
-// 假设的多条回答数据
-const answers = ref([
-  { content: '回答内容1ghdhyibfcedaszxcvnhjjknjmvcdzer', username: '用户名1' },
-  { content: '回答内容2rzxrcgvhbjnmwserdrtfghbnjmvcdzxcvbnm', username: '用户名2' },
-  { content: '回答内容3dxtfcgvhbjnnjhbvgyzretrftyguiytretgvhbjnmvcdzxcvbnm', username: '用户名3' },
-  // 其他回答数据
-])
+const toggleReportA = (id) => {
+  //弹出一个dialog
+  uni.showModal({
+    title: '举报',
+    content: '确定要举报吗？',
+    success: function (res) {
+      if (res.confirm) {
+        //弹出一个表单，用户填写举报理由，输入框至少两行
+        uni.showModal({
+          title: '举报理由',
+          content: '',
+          editable: true,
+          success: function (res) {
+            if (res.confirm) {
+              //用户点击确定，提交举报理由
+              console.log('用户提交了举报理由：', res.content)
+              reportA(id + 1)
+              uni.showToast({
+                icon: 'success',
+                title: '举报成功',
+              })
+            } else if (res.cancel) {
+              console.log('用户点击取消')
+            }
+          },
+        })
+        console.log('用户点击确定')
+      } else if (res.cancel) {
+        console.log('用户点击取消')
+      }
+    },
+  })
+}
 
 function formatDate(dateString) {
   const options = {
@@ -150,21 +311,41 @@ function formatDate(dateString) {
   margin-top: 10px;
 }
 
+.pop {
+  height: 400px;
+}
+
+.follow-icon {
+  width: 25px;
+  height: 25px;
+  margin-right: 2px;
+}
+
 .like-icon {
   width: 25px;
   height: 25px;
   margin-right: 10px;
-  margin-left: 270px;
+}
+
+.likeA-icon {
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+  margin-left: 13px;
+}
+
+.reportA-icon {
+  width: 25px;
+  height: 25px;
+  margin-left: 260px;
 }
 
 .report-icon {
   width: 25px;
   height: 25px;
   margin-right: 10px;
-  margin-left: 12px;
+  margin-left: 200px;
 }
-
-.icon-dislikebtn {}
 
 .icon {
   width: 30px;
@@ -180,37 +361,25 @@ function formatDate(dateString) {
   padding: 10px;
   border: 1px solid #eee;
   border-radius: 5px;
+  text-align: left;
 }
 
 .qtitle {
   font-weight: bold;
   font-size: 21px;
   margin-left: 5%;
+  position: relative;
 }
 
 .qcontent {
   font-size: 16px;
   margin-left: 5%;
+  position: relative;
+  right: 10px;
 }
 
 .qdate {
   font-size: 10px;
   margin-left: 150px;
-}
-
-.follow-btn {
-  width: 16%;
-  height: 1%;
-  margin-right: 6%;
-
-  text-align: auto;
-  font-size: 12px;
-  background-color: #eef5a7;
-  /* 按钮背景色 */
-  color: #070707;
-  /* 按钮文字颜色 */
-  padding: 1px;
-  border-radius: 5px;
-  cursor: pointer;
 }
 </style>

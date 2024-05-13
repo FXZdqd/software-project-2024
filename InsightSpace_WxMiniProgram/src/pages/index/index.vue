@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CustomNavBar from './components/CustomNavBar.vue'
 import CategoryPanel from './components/CategoryPanel.vue'
-import { getAllQAPI } from '@/services/question'
+import { getAllQAPI, addVAPI } from '@/services/question'
 import { ref, onMounted } from 'vue'
 const questions = ref<any[]>([])
 onMounted(
@@ -10,18 +10,16 @@ onMounted(
       const response = await getAllQAPI()
       if (Array.isArray(response)) {
         questions.value = response.map((question) => ({
-          ...question
+          ...question,
         }))
-
       } else {
         questions.value = []
       }
     } catch (error) {
       console.error('There was an error fetching the questions:', error)
     }
-  } //setInterval(, 5000)
+  }, //setInterval(, 5000)
 )
-
 
 function formatDate(dateString) {
   const options = {
@@ -33,31 +31,18 @@ function formatDate(dateString) {
   }
   return new Date(dateString).toLocaleDateString(undefined, options)
 }
-
+const viewid = ref(0)
 const viewInfo = (index: any) => {
-  // 将 q_id 存储在本地存储中
-  uni.setStorageSync('q_id', index);
-  // 跳转详情页
-  uni.navigateTo({ url: '/pages/detail/detail' });
+  uni.setStorageSync('q_id', index)
+  viewid.value = index
+  addview()
+  uni.navigateTo({ url: '/pages/detail/detail' })
 }
-/*
-const questionlist = ref<{ allQuestion: any[] }>({
-  allQuestion: [],
-})
-const getall = async () => {
-  const res = await getAllQAPI()
-  questionlist.value = res as { allQuestion: any[] }
-  console.log(questionlist.value)
-  if (res.value === 0) {
-    console.log('获取主界面问题成功')
-    console.log(res.value)
-    console.log(questionlist.value)
-  } else {
-    console.log('获取主界面问题失败')
-  }
+
+const addview = async () => {
+  const res = await addVAPI({ q_id: viewid.value })
+  console.log(res)
 }
-getall()
-*/
 </script>
 
 <template>
@@ -72,7 +57,7 @@ getall()
   <view class="index">
     <div v-for="question in questions" :key="question.q_id" @click="viewInfo(question.q_id)">
       <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
-        <text>{{ question.content }}</text>
+        <text class="limit-lines">{{ question.content }}</text>
       </uni-card>
     </div>
   </view>
@@ -83,5 +68,12 @@ getall()
 .banner image {
   width: 450px;
   height: 180px;
+}
+
+.limit-lines {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
 }
 </style>
