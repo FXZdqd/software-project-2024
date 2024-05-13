@@ -8,14 +8,16 @@ export const useUserStore = defineStore(
     // 会员信息
     const profile = ref<any>()
 
-    // 保存会员信息，登录时使用
     const setProfile = (val: any) => {
       profile.value = val
     }
 
-    // 清理会员信息，退出时使用
     const clearProfile = () => {
       profile.value = undefined
+    }
+
+    const setUsername = (val: string) => {
+      profile.value.username.value = val;
     }
 
     // 记得 return
@@ -23,6 +25,7 @@ export const useUserStore = defineStore(
       profile,
       setProfile,
       clearProfile,
+      setUsername
     }
   },
   // TODO: 持久化

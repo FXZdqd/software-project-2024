@@ -16,7 +16,23 @@ type RegisterParams = {
   password_re: string,
   phone: number
 }
-
+type usernameParams = {
+  username: string
+}
+type setAvatarParams = {
+  username: string,
+  photo: string
+}
+type rePwd = {
+  username: string,
+  old_password: string,
+  new_password: string,
+  new_password_re: string
+}
+type reUsernameParams = {
+  old_username: string,
+  new_username: string
+}
 /**
  * 小程序登录
  * @param data 请求参数
@@ -39,6 +55,42 @@ export const postRegisterWxMinAPI = (data: RegisterParams) => {
   return http({
     method: 'POST',
     url: '/register',
+    data,
+  })
+}
+
+export const getAvatarAPI = (data: usernameParams) => {
+  return http({
+    method: 'POST',
+    url: '/getAvatar',
+    data,
+  })
+}
+
+export const setAvatarAPI = (data: setAvatarParams) => {
+  return http({
+    method: 'POST',
+    url: '/setAvatar',
+    data,
+  })
+}
+
+export const getUserProfileAPI = (data: usernameParams) => {
+
+}
+
+export const resetPasswordAPI = (data: rePwd) => {
+  return http({
+    method: 'POST',
+    url: '/resetPassword',
+    data,
+  })
+}
+
+export const reUsernameAPI = (data: reUsernameParams) => {
+  return http({
+    method: 'POST',
+    url: '/resetUsername',
     data,
   })
 }
