@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores'
-
+import { deleteUserAPI } from '@/services/user';
+import { ref } from 'vue';
 const userStore = useUserStore()
 // 退出登录
 const onLogout = () => {
-  // 模态弹窗
   uni.showModal({
     content: '是否退出登录？',
     success: (res) => {
@@ -18,12 +18,19 @@ const onLogout = () => {
   })
 }
 
-const cancel = () => {
+const deleteUserData = ref({
+  username: userStore.profile.username,
+  password: ''
+})
+const cancel = async () => {
   uni.showModal({
     title: '注销账号',
     content: '一经注销，账号所有信息将被清空，无法恢复',
-    success: (res) => {
+    success: async (res) => {
       if (res.confirm) {
+        
+        const res = await deleteUserAPI(deleteUserData.value)
+        console.log(res.message);
         // 清理用户信息
         userStore.clearProfile()
         // 返回登录页

@@ -5,9 +5,12 @@ export type LoginResult = {
   phone: BigInteger
 }
 export type ProfileDetail = {
-  user_id: number;
   username: string;
   phone: number;
   is_admin: boolean;
-  is_baned: boolean;
+  is_banned: boolean;
+  reports: number;
+  gender: string,
+  grade: string,
+  department: string,
 }

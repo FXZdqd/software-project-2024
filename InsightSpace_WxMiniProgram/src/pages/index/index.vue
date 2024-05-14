@@ -3,9 +3,11 @@ import CustomNavBar from './components/CustomNavBar.vue'
 import CategoryPanel from './components/CategoryPanel.vue'
 import { getAllQAPI, addVAPI } from '@/services/question'
 import { ref, onMounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 const questions = ref<any[]>([])
-onMounted(
+onShow(
   async () => {
+    console.log('首页onShow被调用了');
     try {
       const response = await getAllQAPI()
       if (Array.isArray(response)) {

@@ -3,6 +3,8 @@ import { useUserStore } from '@/stores'
 import { ref } from 'vue'
 import { getFollowQAPI } from '@/services/question';
 import { getAvatarAPI } from '@/services/user'
+import { onMounted } from 'vue'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 const UserStore = useUserStore()
 
 const FollowQ = ref<any[]>([])
@@ -67,11 +69,23 @@ const getAvatar = async () => {
 }
 getAvatar();
 
+onShow(async () => {
+  getAvatar
+  console.log('onshow被调用了');
+})
+
+/* const getQuestionAskedByUser () => {
+
+}
+const getQuestionAnsweredByUser () => {
+
+} */
+
 
 </script>
 
 <template>
-  <view class="viewport">
+  <view class="viewport" @click="getAvatar">
 
     <image class="background-image" src="/static/images/my_bg.jpg" mode="aspectFill" />
     <!-- 个人资料 -->
@@ -104,8 +118,20 @@ getAvatar();
       <view class="container">
         <scroll-view class="scroll-view-container" :scroll-y="true" :scroll-top="scrollTop">
           <view class="content">
-            <view v-if="current === 0"><text class="content-text">我的提问</text></view>
-            <view v-if="current === 1"><text class="content-text">我的回答</text></view>
+            <view v-if="current === 0"><text class="content-text">
+                <div v-for="question in FollowQ" :key="question.q_id" @click="viewInfo(question.q_id)">
+                  <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
+                    <text>{{ question.content }}</text>
+                  </uni-card>
+                </div>
+              </text></view>
+            <view v-if="current === 1"><text class="content-text">
+                <div v-for="question in FollowQ" :key="question.q_id" @click="viewInfo(question.q_id)">
+                  <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
+                    <text>{{ question.content }}</text>
+                  </uni-card>
+                </div>
+              </text></view>
             <view v-if="current === 2">
               <view class="content-text">
                 <div v-for="question in FollowQ" :key="question.q_id" @click="viewInfo(question.q_id)">
@@ -121,7 +147,6 @@ getAvatar();
         </scroll-view>
       </view>
 
-      <!-- </uni-section> -->
     </view>
 
 

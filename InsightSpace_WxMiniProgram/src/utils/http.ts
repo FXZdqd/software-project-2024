@@ -42,6 +42,7 @@ uni.addInterceptor('uploadFile', httpInterceptor)
  *    3.3 网络错误 -> 提示用户换网络
  */
 type Data<T> = {
+base64: string
   value: number,
 }
 // 2.2 添加类型，支持泛型

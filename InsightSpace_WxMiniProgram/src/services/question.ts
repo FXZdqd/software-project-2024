@@ -4,6 +4,7 @@ type createQParams = {
   title: string
   content: string
   username: string
+  tags: []
 }
 type qidParams = {
   q_id: number
@@ -23,7 +24,6 @@ type keyParams = {
   sort_answers_by: string
   sort_answers_order: string
 }
-<<<<<<< HEAD
 type followParams = {
   username: string
   q_id: number
@@ -46,12 +46,10 @@ type reportQParams = {
 type reportAParams = {
   a_id: number
 }
-=======
 type usernameParams = {
   username: string
 }
 
->>>>>>> a9310b2ccef2d0e33aa8cfc8bfdbc1b12cecfcd7
 /**
  * 提问，添加问题
  * @param data
@@ -91,7 +89,6 @@ export const getKeywordQAPI = (data: keyParams) => {
     data,
   })
 }
-<<<<<<< HEAD
 export const followAPI = (data: likeQParams) => {
   return http({
     method: 'POST',
@@ -145,13 +142,12 @@ export const reportAAPI = (data: reportAParams) => {
   return http({
     method: 'POST',
     url: '/ReporAnswer',
-=======
-
+  })
+}
 export const getFollowQAPI = (data: usernameParams) => { 
   return http({
     method: 'POST',
     url: '/user_follow',
->>>>>>> a9310b2ccef2d0e33aa8cfc8bfdbc1b12cecfcd7
     data,
   })
 }

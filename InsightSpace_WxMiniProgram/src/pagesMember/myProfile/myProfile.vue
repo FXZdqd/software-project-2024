@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { getUserProfileAPI, getAvatarAPI, resetPasswordAPI, setAvatarAPI, reUsernameAPI } from '@/services/user'
+import { getAvatarAPI, resetPasswordAPI, setAvatarAPI, reUsernameAPI, getUserAPI, setUserInfoAPI } from '@/services/user'
 import type { ProfileDetail } from '@/types/user'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import { useUserStore } from '@/stores'
+import { onMounted } from 'vue'
 
 const userStore = useUserStore()
 
@@ -17,78 +18,97 @@ const getAvatar = async () => {
     photo.value = data.base64;
   }
   //console.log(photo.value);
-
 }
 getAvatar();
 
-const imageBase64 = ref('');
-const setAvatarData = ref({
-  username: userStore.profile.username,
-  photo: ''
-})
+let filePath = ''
 const setAvatar = async () => {
   try {
-    // 选择图片  
-    const res = await uni.chooseImage({
-      count: 1, // 默认9  
-      sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有  
-      sourceType: ['album', 'camera'] // 可以指定来源是相册还是相机，默认二者都有  
-    });
-
-    if (res.tempFilePaths.length > 0) {
-      const filePath = res.tempFilePaths[0];
-
-      const fs = uni.getFileSystemManager();
-      const fileRes = await new Promise((resolve, reject) => {
-        fs.readFile({
+    uni.chooseImage({
+      count: 1,
+      sizeType: ['original', 'compressed'],
+      sourceType: ['album', 'camera'],
+      success: function (res) {
+        filePath = res.tempFilePaths[0];
+        uni.uploadFile({
+          url: 'http://39.109.126.173:39001/api/setAvatar',
           filePath: filePath,
-          success: res => {
-            resolve({ errMsg: 'readFile:ok', data: res.data });
+          name: 'photo',
+          formData: {
+            'username': userStore.profile.username
           },
-          fail: err => {
-            reject(err);
+          success: (uploadFileRes) => {
+            console.log(filePath);
+            console.log('上传成功:', uploadFileRes.data);
+            uni.showToast({
+              title: '头像上传成功'
+            });
+            getAvatar();
+          },
+          fail: (err) => {
+            console.error('上传失败:', err);
           }
         });
-      });
-
-      //转换为 base64  
-      const base64 = uni.arrayBufferToBase64(fileRes.data);
-      imageBase64.value = 'data:image/jpeg;base64,' + base64;
-      setAvatarData.value.photo = imageBase64.value;
-
-      //console.log(setAvatarData.value.photo);
-
-      let data = await setAvatarAPI(setAvatarData.value);
-      if (data.value == 0) {
-        uni.showToast({
-          title: '头像设置成功'
-        });
-        getAvatar();
-      } else {
-        uni.showToast({
-          icon: 'error',
-          title: '头像上传成功'
-        });
       }
-    }
+    })
   } catch (error) {
     console.error('图片选择失败', error);
   }
 }
 
+
 const isProfile = ref(true)
 const isRePwd = ref(false)
 // 获取个人信息
-const profile = ref<ProfileDetail>()
+const profile = ref<ProfileDetail>({
+  username: userStore.profile.username,
+  phone: 0,
+  is_admin: false,
+  is_banned: false,
+  reports: 0,
+  gender: '',
+  grade: '',
+  department: ''
+})
 const getUserProfileData = async () => {
-  const res = await getUserProfileAPI({ username: userStore.profile.username })
-  profile.value = res.result
+  try {
+    const res = await getUserAPI({ username: userStore.profile.username })
+    profile.value = res;
+    console.log('用户信息为', profile.value);
+  } catch (error) {
+    console.error('There was an error fetching the questions:', error)
+  }
 }
-
+getUserProfileData()
 onLoad(() => {
   getUserProfileData()
   getAvatar()
 })
+onMounted(
+  getUserProfileData
+)
+
+const setUserInfo = async () => {
+  const setUSerInfoData = ref({
+    username: userStore.profile.username,
+    gender: profile.value.gender,
+    grade: profile.value.grade,
+    department: profile.value.department
+  })
+  //console.log(setUSerInfoData.value);
+  //console.log(profile.value);
+  const res = await setUserInfoAPI(setUSerInfoData.value);
+  console.log(res.message);
+  getUserProfileData
+  //console.log('用户的新设置为：', profile.value);
+  uni.navigateBack();
+  uni.showToast({
+    title: '信息设置成功'
+  });
+}
+const onGenderChange: UniHelper.RadioGroupOnChange = (ev) => {
+  profile.value.gender = ev.detail.value
+}
 
 const rePwdData = ref({
   username: userStore.profile.username,
@@ -193,51 +213,28 @@ const reUsername = async () => {
       <view class="form-content">
         <view class="form-item">
           <text class="label">用户名</text>
-          <!-- <text class="account">{{ profile?.username }}</text> -->
           <text class="account">{{ userStore.profile.username }}</text>
         </view>
-        <!-- <view class="form-item">
-          <text class="label">昵称</text>
-          <input class="input" type="text" placeholder="请填写昵称" :value="profile?.nickname" />
-        </view> -->
         <view class="form-item">
           <text class="label">性别</text>
-          <radio-group>
+          <radio-group @change="onGenderChange">
             <label class="radio">
-              <radio value="男" color="#9bcdff" :checked="profile?.gender === '男'" />
+              <radio value="男" color="#9bcdff" :checked="profile.gender === '男'" />
               男
             </label>
             <label class="radio">
-              <radio value="女" color="#9bcdff" :checked="profile?.gender === '女'" />
+              <radio value="女" color="#9bcdff" :checked="profile.gender === '女'" />
               女
             </label>
           </radio-group>
         </view>
-        <!-- <view class="form-item">
-          <text class="label">出生日期</text>
-          <picker class="picker" mode="date" :value="profile?.birthday" start="1900-01-01" :end="new Date()">
-            <view v-if="profile?.birthday">{{ profile?.birthday }}</view>
-            <view class="placeholder" v-else>请选择日期</view>
-          </picker>
-        </view>
-        <view class="form-item">
-          <text class="label">城市</text>
-          <picker class="picker" :value="profile?.fullLocation?.split(' ')" mode="region">
-            <view v-if="profile?.fullLocation">{{ profile.fullLocation }}</view>
-            <view class="placeholder" v-else>请选择城市</view>
-          </picker>
-        </view> -->
-        <!-- <view class="form-item">
-          <text class="label">职业</text>
-          <input class="input" type="text" placeholder="请填写职业" :value="profile?.profession" />
-        </view> -->
         <view class="form-item">
           <text class="label">年级</text>
-          <input class="input" type="text" placeholder="请填写年级" :value="profile?.grade" />
+          <input class="input" type="text" placeholder="请填写年级" v-model="profile.grade" />
         </view>
         <view class="form-item">
           <text class="label">院系</text>
-          <input class="input" type="text" placeholder="请填写院系" :value="profile?.department" />
+          <input class="input" type="text" placeholder="请填写院系" v-model="profile.department" />
         </view>
       </view>
       <view class="form">
@@ -251,7 +248,7 @@ const reUsername = async () => {
         </view>
       </view>
       <!-- 提交按钮 -->
-      <button class="form-button">保存</button>
+      <button class="form-button" @click="setUserInfo()">保存</button>
     </view>
     <view class="form" v-else-if="isRePwd">
       <view class="form-content">

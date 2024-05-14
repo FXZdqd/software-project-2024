@@ -33,6 +33,17 @@ type reUsernameParams = {
   old_username: string,
   new_username: string
 }
+type setUserInfoParams = {
+  username: string,
+  gender: string,
+  grade: string,
+  department: string
+}
+type deleteUserParams = {
+  username: string,
+  password: string
+}
+
 /**
  * 小程序登录
  * @param data 请求参数
@@ -91,6 +102,30 @@ export const reUsernameAPI = (data: reUsernameParams) => {
   return http({
     method: 'POST',
     url: '/resetUsername',
+    data,
+  })
+}
+
+export const getUserAPI = (data: usernameParams) => {
+  return http({
+    method: 'POST',
+    url: '/getUser',
+    data,
+  })
+}
+
+export const setUserInfoAPI = (data: setUserInfoParams) => {
+  return http({
+    method: 'POST',
+    url: '/setUserInfo',
+    data,
+  })
+}
+
+export const deleteUserAPI = (data: deleteUserParams) => {
+  return http({
+    method: 'POST',
+    url: '/deleteUser',
     data,
   })
 }
