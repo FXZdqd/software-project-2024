@@ -1,23 +1,29 @@
 from rest_framework.views import APIView, Request
 from rest_framework.response import Response
 from rest_framework import status
+from django.utils import timezone
 from app.models import *
 
 
 class DeleteUser(APIView):
-    def delete(self, req: Request):
-        username = req.query_params.get('username')
+    def post(self, req: Request):
+        username = req.data['username']
+        password = req.data['password']
         if not username:
             return Response({"error": "Missing 'username' parameter."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user = User.objects.get(username=username)
-            user.delete()
+            if password != user.password:
+                return Response({"message": f"Password Incorrect"})
+            else:
+                user.delete()
             return Response({"message": f"User '{username}' deleted successfully."})
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class BanUser(APIView):
     def post(self, req: Request):
@@ -27,8 +33,8 @@ class BanUser(APIView):
 
         try:
             user = User.objects.get(username=username)
-            if not user.is_banned:  # Check if the user is already banned
-                user.is_banned = True
+            if not user.is_baned:  # Check if the user is already banned
+                user.is_baned = True
                 user.save()
                 return Response({"message": f"User '{username}' has been successfully banned."})
             else:
@@ -37,6 +43,7 @@ class BanUser(APIView):
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 def check_username(username):
     value = 0
@@ -49,6 +56,30 @@ def check_username(username):
         except User.DoesNotExist:
             value = 2
     return value == 2
+
+class AdminRegister(APIView):
+    def post(self, request):
+        data = request.data
+        phone = str(data.get('phone'))
+        name = str(data.get('username'))
+        password = str(data.get('password'))
+        password_re = str(data.get('password_re'))
+        if not check_username(name):
+            return Response({"value": 3})  # 此用户名已被注册
+        if password != password_re:
+            return Response({"value": 2})  # 两次密码不一致
+        try:
+            u = User.objects.create(
+                username=name,
+                password=password,
+                phone=phone,
+                is_admin=True
+            )
+            u.save()
+        except Exception as e:
+            print(e)
+            return Response({"value": 1})  # 注册失败，请联系管理员
+        return Response({"value": 0})
 
 
 class Register(APIView):
@@ -139,28 +170,30 @@ class UpdatePassword(APIView):
     def post(self, request):
         data = request.data
         username = data.get('username')
+        old_password = data.get('old_password')
         new_password = data.get('new_password')
         new_password_re = data.get('new_password_re')
 
         user = User.objects.filter(username=username).first()
         if not user:
             return Response({"value": 3})  # 用户不存在
-
+        if old_password != user.password:
+            print(old_password)
+            print(user.password)
+            return Response({"value": 4})
         # 检查两次输入的密码是否一致
         if new_password != new_password_re:
             return Response({"value": 2})  # 两次密码不一致
 
         # 更新密码
         try:
-            user.set_password(new_password)
+            user.password = new_password
             user.save()
         except Exception as e:
             print(e)
             return Response({"value": 1})  # 更新失败，请联系管理员
 
         return Response({"value": 0})  # 更新成功
-
-
 
 
 class GetAllUsers(APIView):
@@ -187,7 +220,6 @@ def changePicPath(path):
     with open(path, "rb") as image_file:
         # 读取文件
         image_data = image_file.read()
-        # 对数据进行Base64编码
         base64_encoded_data = base64.b64encode(image_data)
         # 将Base64编码的数据转换为字符串
         base64_message = base64_encoded_data.decode('utf-8')
@@ -199,25 +231,29 @@ class SetAvatar(APIView):
         value = -1
         avator_id = -1
         file = req.FILES.get('photo')
+
         try:
-            username = req.data['username']  # 得到用户名
+            username = req.data.get('username')  # 得到用户名
             user = User.objects.get(username=username)  # 查找用户对象
+
             try:
-                item = Avator.objects.get(user=user)
-                item.file = file
-                item.save()
-                avator_id = item.id
+                avatar = Avator.objects.get(user=user)
             except Avator.DoesNotExist:
-                pic = Avator.objects.create(
-                    file=file,
+                avatar = Avator.objects.create(
                     user=user,
                 )
-                pic.save()
-                avator_id = pic.id
+
+            filename = f"{user.id}_{timezone.now().strftime('%Y%m%d%H%M%S')}.jpg"
+            print(filename)
+            avatar.file.save(filename, file, save=True)
+            avator_id = avatar.id
             value = 0
+        except User.DoesNotExist:
+            value = 2  # 用户不存在
         except Exception as e:
             print(e)
-            value = 1
+            value = 1  # 其他异常
+
         return Response({
             'value': value,
             'avator_id': avator_id,
@@ -228,8 +264,15 @@ class GetAvatar(APIView):
     def post(self, req: Request):
         username = req.data['username']
         path = ''
+        user = User.objects.get(username=username)
+        value = -1
+        if not Avator.objects.filter(user=user).exists():
+            return Response({
+                'value': value,
+                'path': None,
+                'base64': None
+            })
         try:
-            user = User.objects.get(username=username)
             pic = Avator.objects.get(user=user)
             path = pic.file.path
             value = 0
@@ -241,3 +284,56 @@ class GetAvatar(APIView):
             'path': path,
             'base64': changePicPath(path)
         })
+
+
+class SetUserInfo(APIView):
+    def post(self, req: Request):
+        username = req.data.get('username')
+        gender = req.data.get('gender')
+        grade = req.data.get('grade')
+        department = req.data.get('department')
+
+        if not username:
+            return Response({"error": "Missing 'username' parameter."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(username=username)
+
+            if gender is not None:
+                user.gender = gender
+            if grade is not None:
+                user.grade = grade
+            if department is not None:
+                user.department = department
+
+            user.save()
+
+            return Response({"message": "User info updated successfully."})
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+class GetUser(APIView):
+    def post(self, req: Request):
+        username = req.data.get('username')
+
+        if not username:
+            return Response({"error": "Missing 'username' parameter."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(username=username)
+
+            # 构造用户信息，排除密码字段
+            user_info = {
+                'username': user.username,
+                'phone': user.phone,
+                'is_admin': user.is_admin,
+                'is_banned': user.is_baned,
+                'reports': user.reports,
+                'gender': user.gender,
+                'grade': user.grade,
+                'department': user.department,
+            }
+
+            return Response(user_info)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)

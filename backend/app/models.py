@@ -30,6 +30,10 @@ class User(models.Model):
     is_baned = models.BooleanField(default=False)
     new_field = models.CharField(max_length=100, default='default_value')  # 添加默认值
     optional_field = models.CharField(max_length=100, null=True)  # 允许为空
+    reports = models.IntegerField(default=0)
+    gender = models.CharField(max_length=10, blank=True)  # 性别
+    grade = models.CharField(max_length=10, blank=True)  # 年级
+    department = models.CharField(max_length=100, blank=True)  # 院系
 
 
 class Question(models.Model):
@@ -40,6 +44,7 @@ class Question(models.Model):
     likes = models.IntegerField(default=0)
     views = models.IntegerField(default=0)
     tags = models.ManyToManyField(Tag, blank=True)
+    reports = models.IntegerField(default=0)
 
 
 class Answer(models.Model):
@@ -48,6 +53,7 @@ class Answer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
     likes = models.IntegerField(default=0)
+    reports = models.IntegerField(default=0)
 
 
 class UserFollowedQuestion(models.Model):

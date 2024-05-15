@@ -98,11 +98,56 @@ class GetAllQuestions(APIView):
                 'tags': tag_names,
                 'answers': answer_data  # Include answers in the response
             })
-        return Response({
-            "allQuestions": return_data
-        })
+        return Response(return_data)
 
 
+class GetQuestion(APIView):
+    def post(self, req: Request):
+        data = req.data
+        q_id = data['q_id']
+        username = data['username']
+        question = Question.objects.get(id=q_id)
+        answers = question.answers.all()
+        tags = question.tags.all()
+        tag_names = [tag.name for tag in tags]
+        user = User.objects.get(username=username)
+        answer_data = [{
+            'a_id': answer.id,
+            'content': answer.content,
+            'username': answer.user.username,
+            'date': answer.date,
+            'likes': answer.likes,
+            'is_liked':UserLikeAnswer.objects.filter(user=user,answer=answer).exists()
+        } for answer in answers]
+        return_data = {
+            'q_id': question.id,
+            'title': question.title,
+            'content': question.content,
+            'username': question.user.username,
+            'date': question.date,
+            'tags': tag_names,
+            'is_liked':UserLikeQuestion.objects.filter(user=user, question=question).exists(),
+            'is_followed':UserFollowedQuestion.objects.filter(user=user, question=question).exists(),
+            'answers': answer_data
+        }
+        return Response(return_data)
+
+class ViewQuestion(APIView):
+    def post(self, req: Request):
+        q_id = req.data['q_id']
+        if q_id is None:
+            return Response({"error": "Missing 'q_id' parameter."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            question = Question.objects.get(id=q_id)
+            question.views += 1
+            question.save()
+            return Response({"message": "Question View successfully."})
+
+        except Question.DoesNotExist:
+            return Response({"error": "Question not found."}, status=status.HTTP_404_NOT_FOUND)
+        except IntegrityError:
+            return Response({"error": "Could not process like."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class LikeQuestion(APIView):
     def post(self, req: Request):
@@ -163,3 +208,20 @@ class CheckUserLikeQuestion(APIView):
             return Response({"liked": False})
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+class ReportQuestion(APIView):
+    def post(self, req: Request):
+        q_id = req.data.get('q_id')
+
+        if not q_id:
+            return Response({"error": "Missing 'q_id' parameter."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            question = Question.objects.get(id=q_id)
+            question.reports += 1
+            question.user.reports += 1
+            question.save()
+            return Response({"message": "Question reported successfully."})
+        except Question.DoesNotExist:
+            return Response({"error": "Question not found."}, status=status.HTTP_404_NOT_FOUND)
+        except IntegrityError:
+            return Response({"error": "Could not process report."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

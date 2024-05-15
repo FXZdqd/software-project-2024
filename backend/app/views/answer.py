@@ -100,3 +100,27 @@ class CheckUserLikeAnswer(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class ReportAnswer(APIView):
+    def post(self, req: Request):
+        a_id = req.data.get('a_id')
+
+        if not a_id:
+            return Response({"error": "Missing 'a_id' parameter."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            answer = Answer.objects.get(id=a_id)
+            answer.reports += 1
+            answer.save()
+
+            # 同时增加提出问题者和提出回答者的举报数
+            question = answer.question
+            question.user.reports += 1
+            question.user.save()
+            answer.user.reports += 1
+            answer.user.save()
+
+            return Response({"message": "Answer reported successfully."})
+        except Answer.DoesNotExist:
+            return Response({"error": "Answer not found."}, status=status.HTTP_404_NOT_FOUND)
+        except IntegrityError:
+            return Response({"error": "Could not process report."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
