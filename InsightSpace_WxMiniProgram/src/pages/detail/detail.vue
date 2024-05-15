@@ -2,7 +2,9 @@
   <view>
     <!-- 问题发布者头像和名称 -->
     <view class="user-info">
-      <image class="avatar" src="../../../static/images/avatar0.png"></image>
+      <image v-if="question.base64 !== null" class="avatar" :src="'data:image/jpeg;base64,' + question.base64"
+        @tap="toggleSee(question.username)" />
+      <image v-else class="avatar" src="@/static/images/avatar1.png" @tap="toggleSee(question.username)" />
       <text class="username">{{ question.username }}</text>
       <text class="qdate">{{ question.date }}</text>
     </view>
@@ -57,8 +59,10 @@
       <view v-for="(answer, index) in question.answers" :key="index" class="answer">
         <!-- 回答者头像和名称 -->
         <view class="user-info">
-          <image class="avatar" src="../../../static/images/avatar1.png"></image>
-          <text class="username">{{ answer.username }}</text>
+          <img v-if="answer.base64 !== null" class="avatar" :src="'data:image/jpeg;base64,' + answer.base64"
+            @tap="toggleSee(answer.username)" />
+          <img v-else class=" avatar" src="@/static/images/avatar1.png" @tap="toggleSee(answer.username)" />
+          <text class=" username">{{ answer.username }}</text>
         </view>
         <text>{{ answer.content }}</text>
         <!-- 点赞和踩按钮 -->
@@ -110,6 +114,7 @@ const question = ref({
   date: '',
   answers: [null],
   tags: [null],
+  base64: '',
   is_liked: Boolean,
   is_followed: Boolean,
 })
@@ -166,6 +171,8 @@ const getDetails = async () => {
   question.value.title = res.title
   question.value.content = res.content
   question.value.username = res.username
+  if(res.base64 == 'null') question.value.base64 = ''
+  else question.value.base64 = res.base64
   question.value.date = formatDate(res.date)
   question.value.answers = res.answers
   question.value.is_liked = res.is_liked
@@ -201,7 +208,11 @@ const likeIconSrcA = [5]
 for (let i = 0; i < question.value.answers.length; i++) {
   likeIconSrcA.push('/static/images/like.png')
 }
-const toggleLikeQ = () => {
+const toggleSee = (name) => {
+  uni.setStorageSync('otherUsername', name)
+  uni.navigateTo({ url: '/pagesMember/otherProfile/otherProfile' })
+ }
+ const toggleLikeQ = () => {
   console.log('1', question.value.is_liked)
   if (question.value.is_liked) {
     //取消点赞

@@ -11,7 +11,7 @@ const httpInterceptor = {
       options.url = baseURL + options.url
     }
     // 2. 请求超时, 默认 60s
-    options.timeout = 10000
+    options.timeout = 100000
     // 3. 添加小程序端请求头标识
     options.header = {
       ...options.header,
@@ -42,8 +42,8 @@ uni.addInterceptor('uploadFile', httpInterceptor)
  *    3.3 网络错误 -> 提示用户换网络
  */
 type Data<T> = {
-base64: string
-  value: number,
+  base64: string
+  value: number
 }
 // 2.2 添加类型，支持泛型
 export const http = <T>(options: UniApp.RequestOptions) => {
