@@ -19,14 +19,16 @@
 			"style": {
 				"navigationStyle": "custom", // 隐藏默认导航
 				"navigationBarTextStyle": "black",
-				"navigationBarTitleText": "灵询问答 · 智慧领航"
+				"navigationBarTitleText": "灵询问答 · 智慧领航",
+				"enablePullDownRefresh": true
 			}
 		},
 		{
 			//详情页
 			"path": "pages/detail/detail",
 			"style": {
-				"navigationBarTitleText": "详情"
+				"navigationBarTitleText": "详情",
+				"enablePullDownRefresh": true
 			}
 		},
 		{

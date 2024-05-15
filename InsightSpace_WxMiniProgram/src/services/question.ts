@@ -54,6 +54,12 @@ type answerParams = {
   username: string
   content: string
 }
+type delQParams = {
+  q_id: number
+}
+type delAParams = {
+  a_id: number
+}
 /**
  * 提问，添加问题
  * @param data
@@ -167,6 +173,20 @@ export const goAnswerAPI = (data: answerParams) => {
   return http({
     method: 'POST',
     url: '/goAnswer',
+    data,
+  })
+}
+export const delQAPI = (data: delQParams) => {
+  return http({
+    method: 'POST',
+    url: '/delQuestion',
+    data,
+  })
+}
+export const delAAPI = (data: delAParams) => {
+  return http({
+    method: 'POST',
+    url: '/delAnswer',
     data,
   })
 }

@@ -24,7 +24,11 @@
     <view class="qcontent">
       <text>{{ question.content }}</text>
       <icon>
-        <image class="report-icon" src="/static/images/report1.png" @tap="toggleReportQ"></image>
+        <image v-if="question.username !== name" class="report-icon" src="/static/images/report1.png"
+          @tap="toggleReportQ">
+        </image>
+        <image v-else class="report-icon" src="/static/images/delete.png" @tap="toggleDeleteQ(question.a_id - 1)">
+        </image>
         <image class="like-icon" :src="likeIconSrc" @tap="toggleLikeQ"></image>
         <image class="follow-icon" :src="followIconSrc" @tap="togglefollow"></image>
       </icon>
@@ -60,7 +64,10 @@
         <!-- 点赞和踩按钮 -->
         <view class="like-dislike">
           <icon>
-            <image class="reportA-icon" src="/static/images/report1.png" @tap="toggleReportA(answer.a_id - 1)">
+            <image v-if="answer.username !== name" class="reportA-icon" src="/static/images/report1.png"
+              @tap="toggleReportA(answer.a_id - 1)">
+            </image>
+            <image v-else class="reportA-icon" src="/static/images/delete.png" @tap="toggleDeleteA(answer.a_id - 1)">
             </image>
             <image class="likeA-icon" :src="answer.is_liked ? '/static/images/liked.png' : '/static/images/like.png'"
               @tap="toggleLikeA(answer.a_id - 1)">
@@ -74,7 +81,7 @@
 
 <script setup>
 // 使用 setup 函数初始化数据
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import {
   getQAPI,
   followAPI,
@@ -86,9 +93,29 @@ import {
   reportQAPI,
   reportAAPI,
   goAnswerAPI,
+  delQAPI,
+  delAAPI,
 } from '@/services/question'
 import { useUserStore } from '@/stores'
+import { deleteUserAPI } from '@/services/user'
 const popup = ref(null)
+const name = ref('')
+// 获取 q_id
+let qid = uni.getStorageSync('q_id')
+console.log('q_id:', qid)
+const question = ref({
+  title: '',
+  content: '',
+  username: '',
+  date: '',
+  answers: [null],
+  tags: [null],
+  is_liked: Boolean,
+  is_followed: Boolean,
+})
+onMounted(() => {
+  getDetails()
+})
 const handleAnswer = () => {
   popup.value.open()
 }
@@ -106,19 +133,7 @@ const goAnswer = async () => {
   })
   console.log(res)
 }
-// 获取 q_id
-let qid = uni.getStorageSync('q_id')
-console.log('q_id:', qid)
-const question = ref({
-  title: '',
-  content: '',
-  username: '',
-  date: '',
-  answers: [],
-  tags: [],
-  is_liked: Boolean,
-  is_followed: Boolean,
-})
+
 const getTagType = (tag) => {
   if (tag === 'course') {
     return 'primary'
@@ -145,6 +160,7 @@ const tagname = (tag) => {
     return '其他'
   }
 }
+
 const getDetails = async () => {
   const res = await getQAPI({ q_id: qid, username: UserStore.profile.username })
   question.value.title = res.title
@@ -155,6 +171,7 @@ const getDetails = async () => {
   question.value.is_liked = res.is_liked
   question.value.is_followed = res.is_followed
   question.value.tags = res.tags
+  name.value = UserStore.profile.username
   console.log(question.value)
 
   if (question.value.is_liked) {
@@ -172,7 +189,6 @@ const getDetails = async () => {
     followIconSrc.value = '/static/images/follow.png'
   }
 }
-getDetails()
 
 const likeIconSrc = ref('/static/images/like.png')
 const followIconSrc = ref('/static/images/follow.png')
@@ -230,6 +246,14 @@ const togglefollow = () => {
     : '/static/images/follow.png'
   console.log(followIconSrc.value)
 }
+const delQ = async () => {
+  const res = await delQAPI({ q_id: qid })
+  console.log(res)
+}
+const delA = async (id) => {
+  const res = await delAAPI({ a_id: id })
+  console.log(res)
+}
 const likeQ = async () => {
   console.log('执行点赞')
   const res = await likeQAPI({ q_id: qid, username: UserStore.profile.username })
@@ -265,7 +289,34 @@ const reportA = async (id) => {
   const res = await reportAAPI({ a_id: id })
   console.log(res)
 }
-
+const toggleDeleteA = (id) => {
+  uni.showModal({
+    title: '删除',
+    content: '确定要删除吗？',
+    success: function (res) {
+      if (res.confirm) {
+        console.log('用户点击确定')
+        delA(id + 1)
+      } else if (res.cancel) {
+        console.log('用户点击取消')
+      }
+    },
+  })
+}
+const toggleDeleteQ = () => {
+  uni.showModal({
+    title: '删除',
+    content: '确定要删除吗？',
+    success: function (res) {
+      if (res.confirm) {
+        console.log('用户点击确定')
+        delQ()
+      } else if (res.cancel) {
+        console.log('用户点击取消')
+      }
+    },
+  })
+}
 const toggleReportQ = () => {
   //弹出一个dialog
   uni.showModal({

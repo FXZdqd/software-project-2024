@@ -131,7 +131,6 @@ export const deleteUserAPI = (data: usernameParams) => {
     data,
   })
 }
-<<<<<<< HEAD
 export const searchUserAPI = (data: searchUserParams) => {
   return http({
     method: 'POST',
@@ -139,7 +138,6 @@ export const searchUserAPI = (data: searchUserParams) => {
     data,
   })
 }
-=======
 /**
  * 我的提问
  * @param data 
@@ -165,4 +163,3 @@ export const getQuestionAnsweredByUserAPI = (data: usernameParams) => {
     data,
   })
 }
->>>>>>> b73ed9090378e9e842bd8038fc9893ca667b8492
