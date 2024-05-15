@@ -124,13 +124,14 @@ export const setUserInfoAPI = (data: setUserInfoParams) => {
   })
 }
 
-export const deleteUserAPI = (data: deleteUserParams) => {
+export const deleteUserAPI = (data: usernameParams) => {
   return http({
     method: 'POST',
     url: '/deleteUser',
     data,
   })
 }
+<<<<<<< HEAD
 export const searchUserAPI = (data: searchUserParams) => {
   return http({
     method: 'POST',
@@ -138,3 +139,30 @@ export const searchUserAPI = (data: searchUserParams) => {
     data,
   })
 }
+=======
+/**
+ * 我的提问
+ * @param data 
+ * @returns 
+ */
+export const getQuestionAskedByUserAPI = (data: usernameParams) => {
+  return http({
+    method: 'POST',
+    url: '/getQuestionAskedByUser',
+    data,
+  })
+}
+
+/**
+ * 我的回答
+ * @param data 
+ * @returns 
+ */
+export const getQuestionAnsweredByUserAPI = (data: usernameParams) => {
+  return http({
+    method: 'POST',
+    url: '/getQuestionAnsweredByUser',
+    data,
+  })
+}
+>>>>>>> b73ed9090378e9e842bd8038fc9893ca667b8492

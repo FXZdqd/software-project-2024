@@ -119,7 +119,7 @@
 				{
 					"path": "otherProfile/otherProfile",
 					"style": {
-            "navigationStyle": "custom",
+            //"navigationStyle": "custom",
 						"navigationBarTitleText": "个人信息"
 					}
 				}

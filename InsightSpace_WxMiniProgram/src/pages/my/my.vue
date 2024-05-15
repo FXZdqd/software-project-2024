@@ -2,12 +2,15 @@
 import { useUserStore } from '@/stores'
 import { ref } from 'vue'
 import { getFollowQAPI } from '@/services/question';
-import { getAvatarAPI } from '@/services/user'
+import { getAvatarAPI, getQuestionAskedByUserAPI, getQuestionAnsweredByUserAPI } from '@/services/user'
 import { onMounted } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 const UserStore = useUserStore()
 
 const FollowQ = ref<any[]>([])
+const AskQ = ref<any[]>([])
+const AnsQ = ref<any[]>([])
+
 //获取会员信息
 const userStore = useUserStore()
 
@@ -19,6 +22,10 @@ const onClickItem = (e) => {
     current.value = e.currentIndex
     if (current.value == 2) {
       getFollowQ();
+    } else if (current.value == 0) {
+      getQuestionAskedByUser();
+    } else if (current.value == 1) {
+      getQuestionAnsweredByUser();
     }
   }
 }
@@ -37,7 +44,38 @@ const getFollowQ = async () => {
     } else {
       FollowQ.value = []
     }
-    console.log(FollowQ.value);
+    console.log('我的关注', FollowQ.value);
+  } catch (error) {
+    console.error('There was an error fetching the questions:', error)
+  }
+}
+
+const getQuestionAskedByUser = async () => {
+  try {
+    const response = await getQuestionAskedByUserAPI({ username: UserStore.profile.username })
+    if (Array.isArray(response)) {
+      AskQ.value = response.map((question) => ({
+        ...question
+      }))
+    } else {
+      AskQ.value = []
+    }
+    console.log('我的提问：', AskQ.value);
+  } catch (error) {
+    console.error('There was an error fetching the questions:', error)
+  }
+}
+const getQuestionAnsweredByUser = async () => {
+  try {
+    const response = await getQuestionAnsweredByUserAPI({ username: UserStore.profile.username })
+    if (Array.isArray(response)) {
+      AnsQ.value = response.map((question) => ({
+        ...question
+      }))
+    } else {
+      AnsQ.value = []
+    }
+    console.log('我的回答', AnsQ.value);
   } catch (error) {
     console.error('There was an error fetching the questions:', error)
   }
@@ -60,40 +98,43 @@ function formatDate(dateString: any) {
   return new Date(dateString).toLocaleDateString(undefined, options)
 }
 var photo = ref('')
-
+const isphoto = ref(false)
 const getAvatar = async () => {
   let data = await getAvatarAPI({ username: userStore.profile.username });
   if (data.value == 0) {
+    isphoto.value = true;
     photo.value = data.base64;
+  } else {
+    console.log('用户未设置头像');
   }
 }
 getAvatar();
 
 onShow(async () => {
   getAvatar
+  getQuestionAskedByUser
   console.log('onshow被调用了');
 })
-
-/* const getQuestionAskedByUser () => {
-
-}
-const getQuestionAnsweredByUser () => {
-
-} */
-
-
 </script>
 
 <template>
-  <view class="viewport" @click="getAvatar">
+  <view class="viewport">
 
     <image class="background-image" src="/static/images/my_bg.jpg" mode="aspectFill" />
     <!-- 个人资料 -->
     <view class="profile" :style="{ paddingTop: safeAreaInsets!.top + 'px' }">
 
-      <view class="overview">
-        <navigator url="/pagesMember/myProfile/myProfile" hover-class="none">
-          <image class="avatar" mode="aspectFill" :src="'data:image/jpeg;base64,' + photo"></image>
+      <view class="overview" v-if="isphoto">
+        <navigator url="/pagesMember/myProfile/myProfile" hover-class="none" @click="getAvatar">
+          <image class="avatar" mode="aspectFill" :src="('data:image/jpeg;base64,' + photo)" />
+        </navigator>
+        <view class="meta">
+          <view class="nickname">{{ UserStore.profile.username }}</view>
+        </view>
+      </view>
+      <view class="overview" v-else>
+        <navigator url="/pagesMember/myProfile/myProfile" hover-class="none" @click="getAvatar">
+          <image class="avatar" mode="aspectFill" src="../../../static/images/avatar1.png" />
         </navigator>
         <view class="meta">
           <view class="nickname">{{ UserStore.profile.username }}</view>
@@ -102,14 +143,10 @@ const getQuestionAnsweredByUser () => {
 
       <navigator class="settings" url="/pagesMember/settings/settings" hover-class="none">
         <image class="icon" src="/static/images/set.png" mode="aspectFill" />
-        <!-- <text class="settings-text">设置</text> -->
       </navigator>
     </view>
-    <!-- 分割线 -->
-    <!-- <view class="uni-divider" /> -->
 
     <view class="down">
-      <!-- <uni-section class="section"> -->
       <view class="uni-divider" />
       <view class="uni-padding-wrap uni-common-mt">
         <uni-segmented-control :current="current" :values="items" style-type=text @clickItem="onClickItem" />
@@ -118,21 +155,25 @@ const getQuestionAnsweredByUser () => {
       <view class="container">
         <scroll-view class="scroll-view-container" :scroll-y="true" :scroll-top="scrollTop">
           <view class="content">
-            <view v-if="current === 0"><text class="content-text">
-                <div v-for="question in FollowQ" :key="question.q_id" @click="viewInfo(question.q_id)">
+            <view v-if="current === 0"><!-- 我的提问 -->
+              <view class="content-text">
+                <div v-for="question in AskQ" :key="question.q_id" @click="viewInfo(question.q_id)">
                   <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
                     <text>{{ question.content }}</text>
                   </uni-card>
                 </div>
-              </text></view>
-            <view v-if="current === 1"><text class="content-text">
-                <div v-for="question in FollowQ" :key="question.q_id" @click="viewInfo(question.q_id)">
+              </view>
+            </view>
+            <view v-if="current === 1"><!-- 我的回答 -->
+              <view class="content-text">
+                <div v-for="question in AnsQ" :key="question.q_id" @click="viewInfo(question.q_id)">
                   <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
                     <text>{{ question.content }}</text>
                   </uni-card>
                 </div>
-              </text></view>
-            <view v-if="current === 2">
+              </view>
+            </view>
+            <view v-if="current === 2"><!-- 我的关注 -->
               <view class="content-text">
                 <div v-for="question in FollowQ" :key="question.q_id" @click="viewInfo(question.q_id)">
                   <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
