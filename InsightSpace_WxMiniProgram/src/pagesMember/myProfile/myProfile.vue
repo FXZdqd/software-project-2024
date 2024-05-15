@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { getAvatarAPI, resetPasswordAPI, setAvatarAPI, 
-  reUsernameAPI, getUserAPI, setUserInfoAPI,  } from '@/services/user'
+import {
+  getAvatarAPI, resetPasswordAPI, setAvatarAPI,
+  reUsernameAPI, getUserAPI, setUserInfoAPI,
+} from '@/services/user'
 import type { ProfileDetail } from '@/types/user'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
@@ -13,12 +15,13 @@ const userStore = useUserStore()
 const { safeAreaInsets } = uni.getSystemInfoSync()
 
 var photo = ref('')
+const isphoto = ref(false)
 const getAvatar = async () => {
   let data = await getAvatarAPI({ username: userStore.profile.username });
   if (data.value == 0) {
+    isphoto.value = true
     photo.value = data.base64;
   }
-  //console.log(photo.value);
 }
 getAvatar();
 
@@ -203,8 +206,12 @@ const reUsername = async () => {
     </view>
     <!-- 头像 -->
     <view class="avatar">
-      <view class="avatar-content" @click="setAvatar()">
+      <view class="avatar-content" @click="setAvatar()" v-if="isphoto">
         <image class="image" :src="'data:image/jpeg;base64,' + photo" mode="aspectFill" />
+        <view class="text">点击修改头像</view>
+      </view>
+      <view class="avatar-content" @click="setAvatar()" v-else>
+        <image class="image" src="../../../static/images/avatar1.png" mode="aspectFill" />
         <view class="text">点击修改头像</view>
       </view>
     </view>

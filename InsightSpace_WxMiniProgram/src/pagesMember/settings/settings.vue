@@ -22,22 +22,35 @@ const deleteUserData = ref({
   username: userStore.profile.username,
   password: ''
 })
+
 const cancel = async () => {
   uni.showModal({
     title: '注销账号',
     content: '一经注销，账号所有信息将被清空，无法恢复',
     success: async (res) => {
       if (res.confirm) {
-        
-        const res = await deleteUserAPI(deleteUserData.value)
-        console.log(res.message);
-        // 清理用户信息
-        userStore.clearProfile()
-        // 返回登录页
-        uni.reLaunch({ url: '/pages/login/login' });
-        uni.showToast({
-          title: '注销成功'
-        });
+        uni.showModal({
+          title: '请输入密码',
+          editable: true,
+          success: async (res1) => {
+            if (res1.content == userStore.profile.password) {
+              const res2 = await deleteUserAPI({username: userStore.profile.username})
+              console.log(res2.message);
+              // 清理用户信息
+              userStore.clearProfile()
+              // 返回登录页
+              uni.reLaunch({ url: '/pages/login/login' });
+              uni.showToast({
+                title: '注销成功'
+              });
+            } else {
+              uni.showToast({
+                icon: 'error',
+                title: '密码错误'
+              });
+            }
+          },
+        })
       }
     },
   })

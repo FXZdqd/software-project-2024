@@ -97,10 +97,11 @@ function formatDate(dateString: any) {
   return new Date(dateString).toLocaleDateString(undefined, options)
 }
 var photo = ref('')
-
+const isphoto = ref(false)
 const getAvatar = async () => {
   let data = await getAvatarAPI({ username: otherUsername });
   if (data.value == 0) {
+    isphoto.value = true
     photo.value = data.base64;
   }
 }
@@ -120,7 +121,7 @@ onShow(async () => {
     <!-- 个人资料 -->
     <view class="profile" :style="{ paddingTop: safeAreaInsets!.top + 'px' }">
 
-      <view class="overview">
+      <view class="overview" v-if="isphoto">
         <navigator url="/pagesMember/myProfile/myProfile" hover-class="none">
           <image class="avatar" mode="aspectFill" :src="'data:image/jpeg;base64,' + photo"></image>
         </navigator>
@@ -128,10 +129,15 @@ onShow(async () => {
           <view class="nickname">{{ otherUsername }}</view>
         </view>
       </view>
+      <view class="overview" v-else>
+        <navigator url="/pagesMember/myProfile/myProfile" hover-class="none">
+          <image class="avatar" mode="aspectFill" src="../../../static/images/avatar1.png"></image>
+        </navigator>
+        <view class="meta">
+          <view class="nickname">{{ otherUsername }}</view>
+        </view>
+      </view>
 
-      <!-- <navigator class="settings" url="/pagesMember/settings/settings" hover-class="none">
-        <image class="icon" src="/static/images/set.png" mode="aspectFill" />
-      </navigator> -->
     </view>
     <!-- 分割线 -->
     <!-- <view class="uni-divider" /> -->
@@ -147,22 +153,22 @@ onShow(async () => {
         <scroll-view class="scroll-view-container" :scroll-y="true" :scroll-top="scrollTop">
           <view class="content">
             <view v-if="current === 0">
-              <text class="content-text">
+              <view class="content-text">
                 <div v-for="question in AskQ" :key="question.q_id" @click="viewInfo(question.q_id)">
                   <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
                     <text>{{ question.content }}</text>
                   </uni-card>
                 </div>
-              </text>
+              </view>
             </view>
             <view v-if="current === 1">
-              <text class="content-text">
+              <view class="content-text">
                 <div v-for="question in AnsQ" :key="question.q_id" @click="viewInfo(question.q_id)">
                   <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
                     <text>{{ question.content }}</text>
                   </uni-card>
                 </div>
-              </text>
+              </view>
             </view>
             <view v-if="current === 2">
               <view class="content-text">
