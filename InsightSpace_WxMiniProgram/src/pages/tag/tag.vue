@@ -62,4 +62,6 @@ const viewInfo = (index) => {
 }
 </script>
 
-<style></style>
+<style lang>
+
+</style>

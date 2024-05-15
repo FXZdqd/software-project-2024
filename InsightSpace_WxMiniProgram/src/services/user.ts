@@ -43,7 +43,9 @@ type deleteUserParams = {
   username: string,
   password: string
 }
-
+type searchUserParams = {
+  keyword: string
+}
 /**
  * 小程序登录
  * @param data 请求参数
@@ -126,6 +128,13 @@ export const deleteUserAPI = (data: deleteUserParams) => {
   return http({
     method: 'POST',
     url: '/deleteUser',
+    data,
+  })
+}
+export const searchUserAPI = (data: searchUserParams) => {
+  return http({
+    method: 'POST',
+    url: '/searchUser',
     data,
   })
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores'
 import { ref } from 'vue'
-import { getFollowQAPI } from '@/services/question';
+import { getFollowQAPI } from '@/services/question'
 import { getAvatarAPI } from '@/services/user'
 import { onMounted } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
@@ -10,7 +10,7 @@ const UserStore = useUserStore()
 const FollowQ = ref<any[]>([])
 //获取会员信息
 const userStore = useUserStore()
-const otherUsername = uni.getStorageSync('otherUsername');
+const otherUsername = uni.getStorageSync('otherUsername')
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 const current = ref(0)
@@ -18,12 +18,12 @@ const onClickItem = (e) => {
   if (current.value !== e.currentIndex) {
     current.value = e.currentIndex
     if (current.value == 2) {
-      getFollowQ();
+      getFollowQ()
     }
   }
 }
 
-const scrollTop = ref(0);
+const scrollTop = ref(0)
 
 const items = ['ta的提问', 'ta的回答', 'ta的关注']
 
@@ -32,12 +32,12 @@ const getFollowQ = async () => {
     const response = await getFollowQAPI({ username: otherUsername })
     if (Array.isArray(response)) {
       FollowQ.value = response.map((question) => ({
-        ...question
+        ...question,
       }))
     } else {
       FollowQ.value = []
     }
-    console.log(FollowQ.value);
+    console.log(FollowQ.value)
   } catch (error) {
     console.error('There was an error fetching the questions:', error)
   }
@@ -45,9 +45,9 @@ const getFollowQ = async () => {
 
 const viewInfo = (index: any) => {
   // 将 q_id 存储在本地存储中
-  uni.setStorageSync('q_id', index);
+  uni.setStorageSync('q_id', index)
   // 跳转详情页
-  uni.navigateTo({ url: '/pages/detail/detail' });
+  uni.navigateTo({ url: '/pages/detail/detail' })
 }
 function formatDate(dateString: any) {
   const options = {
@@ -62,27 +62,24 @@ function formatDate(dateString: any) {
 var photo = ref('')
 
 const getAvatar = async () => {
-  let data = await getAvatarAPI({ username: otherUsername });
+  let data = await getAvatarAPI({ username: otherUsername })
   if (data.value == 0) {
-    photo.value = data.base64;
+    photo.value = data.base64
   }
 }
-getAvatar();
+getAvatar()
 
 onShow(async () => {
   getAvatar
-  console.log('onshow被调用了');
+  console.log('onshow被调用了')
 })
-
 </script>
 
 <template>
   <view class="viewport" @click="getAvatar">
-
     <image class="background-image" src="/static/images/my_bg.jpg" mode="aspectFill" />
     <!-- 个人资料 -->
     <view class="profile" :style="{ paddingTop: safeAreaInsets!.top + 'px' }">
-
       <view class="overview">
         <navigator url="/pagesMember/myProfile/myProfile" hover-class="none">
           <image class="avatar" mode="aspectFill" :src="'data:image/jpeg;base64,' + photo"></image>
@@ -103,7 +100,12 @@ onShow(async () => {
       <!-- <uni-section class="section"> -->
       <view class="uni-divider" />
       <view class="uni-padding-wrap uni-common-mt">
-        <uni-segmented-control :current="current" :values="items" style-type=text @clickItem="onClickItem" />
+        <uni-segmented-control
+          :current="current"
+          :values="items"
+          style-type="text"
+          @clickItem="onClickItem"
+        />
       </view>
       <view class="uni-divider" />
       <view class="container">
@@ -113,8 +115,16 @@ onShow(async () => {
             <view v-if="current === 1"><text class="content-text">ta的回答</text></view>
             <view v-if="current === 2">
               <view class="content-text">
-                <div v-for="question in FollowQ" :key="question.q_id" @click="viewInfo(question.q_id)">
-                  <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
+                <div
+                  v-for="question in FollowQ"
+                  :key="question.q_id"
+                  @click="viewInfo(question.q_id)"
+                >
+                  <uni-card
+                    :title="question.title"
+                    :sub-title="question.username"
+                    :extra="formatDate(question.date)"
+                  >
                     <text>{{ question.content }}</text>
                   </uni-card>
                 </div>
@@ -125,10 +135,7 @@ onShow(async () => {
           </view>
         </scroll-view>
       </view>
-
     </view>
-
-
   </view>
 </template>
 
@@ -245,7 +252,7 @@ page {
   width: 100%;
   height: 7px;
   background-color: #d6d6d6;
-  //margin: 10px 0;  
+  //margin: 10px 0;
   //margin-top: px;
   overflow: visible;
 }
@@ -275,6 +282,6 @@ page {
   text-align: center;
   margin-top: 5px;
   margin-bottom: 25px;
-  color: #b7b7b7
+  color: #b7b7b7;
 }
 </style>

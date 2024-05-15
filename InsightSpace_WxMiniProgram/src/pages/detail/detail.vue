@@ -12,6 +12,13 @@
       <text>{{ question.title }}</text>
     </view>
 
+    <!--标签-->
+    <view class="row">
+      <view class="col" v-for="(tag, index) in question.tags" :key="index">
+        <uni-tag class="tag" :inverted="true" :text="tagname(tag)" :type="getTagType(tag)" />
+      </view>
+    </view>
+
     <b></b>
     <!-- 问题内容 -->
     <view class="qcontent">
@@ -22,6 +29,7 @@
         <image class="follow-icon" :src="followIconSrc" @tap="togglefollow"></image>
       </icon>
     </view>
+
     <b></b>
     <view>
       <button class="button" type="primary" plain="true" @click="handleAnswer">
@@ -35,7 +43,7 @@
           <uni-forms-item>
             <uni-easyinput type="textarea" v-model="myanswer" placeholder="请输入您的回答" />
           </uni-forms-item>
-          <button type="primary" plain="true">发布</button>
+          <button type="primary" plain="true" @click="handlegoAnswer">发布</button>
         </view>
       </uni-popup>
     </view>
@@ -52,7 +60,8 @@
         <!-- 点赞和踩按钮 -->
         <view class="like-dislike">
           <icon>
-            <image class="reportA-icon" src="/static/images/report1.png" @tap="toggleReportA(answer.a_id - 1)"></image>
+            <image class="reportA-icon" src="/static/images/report1.png" @tap="toggleReportA(answer.a_id - 1)">
+            </image>
             <image class="likeA-icon" :src="answer.is_liked ? '/static/images/liked.png' : '/static/images/like.png'"
               @tap="toggleLikeA(answer.a_id - 1)">
             </image>
@@ -65,24 +74,38 @@
 
 <script setup>
 // 使用 setup 函数初始化数据
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import {
   getQAPI,
   followAPI,
+  unfollowAPI,
   likeQAPI,
   unlikeQAPI,
   likeAAPI,
   unlikeAAPI,
   reportQAPI,
   reportAAPI,
+  goAnswerAPI,
 } from '@/services/question'
 import { useUserStore } from '@/stores'
 const popup = ref(null)
 const handleAnswer = () => {
   popup.value.open()
 }
+const handlegoAnswer = () => {
+  goAnswer()
+  popup.value.close()
+}
 const myanswer = ref('')
 const UserStore = useUserStore()
+const goAnswer = async () => {
+  const res = await goAnswerAPI({
+    q_id: qid,
+    content: myanswer.value,
+    username: UserStore.profile.username,
+  })
+  console.log(res)
+}
 // 获取 q_id
 let qid = uni.getStorageSync('q_id')
 console.log('q_id:', qid)
@@ -92,9 +115,36 @@ const question = ref({
   username: '',
   date: '',
   answers: [],
+  tags: [],
   is_liked: Boolean,
   is_followed: Boolean,
 })
+const getTagType = (tag) => {
+  if (tag === 'course') {
+    return 'primary'
+  } else if (tag === 'research') {
+    return 'success'
+  } else if (tag === 'further_study') {
+    return 'warning'
+  } else if (tag === 'competition') {
+    return 'error'
+  } else {
+    return 'default'
+  }
+}
+const tagname = (tag) => {
+  if (tag === 'course') {
+    return '课程'
+  } else if (tag === 'research') {
+    return '科研'
+  } else if (tag === 'further_study') {
+    return '升学'
+  } else if (tag === 'competition') {
+    return '竞赛'
+  } else {
+    return '其他'
+  }
+}
 const getDetails = async () => {
   const res = await getQAPI({ q_id: qid, username: UserStore.profile.username })
   question.value.title = res.title
@@ -104,6 +154,7 @@ const getDetails = async () => {
   question.value.answers = res.answers
   question.value.is_liked = res.is_liked
   question.value.is_followed = res.is_followed
+  question.value.tags = res.tags
   console.log(question.value)
 
   if (question.value.is_liked) {
@@ -165,12 +216,14 @@ const toggleLikeA = (id) => {
 }
 
 const togglefollow = () => {
-  console.log(question.value.answers.is_followed)
+  console.log(question.value.is_followed)
   if (question.value.is_followed) {
     console.log('取消关注')
+    unfollowQ()
+    question.value.is_followed = false
   } else {
     followQ()
-    question.value.answers.is_followed = true
+    question.value.is_followed = true
   }
   followIconSrc.value = question.value.is_followed
     ? '/static/images/followed.png'
@@ -198,6 +251,10 @@ const unlikeA = async (id) => {
 }
 const followQ = async () => {
   const res = await followAPI({ q_id: qid, username: UserStore.profile.username })
+  console.log(res)
+}
+const unfollowQ = async () => {
+  const res = await unfollowAPI({ q_id: qid, username: UserStore.profile.username })
   console.log(res)
 }
 const reportQ = async () => {
@@ -381,5 +438,22 @@ function formatDate(dateString) {
 .qdate {
   font-size: 10px;
   margin-left: 150px;
+}
+
+.tag {
+  width: 30px;
+  height: 7px;
+}
+
+.row {
+  display: flex;
+  width: 35%;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  margin-left: 5px;
+}
+
+.col {
+  flex: 1;
 }
 </style>

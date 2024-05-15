@@ -7,7 +7,7 @@ import { onShow } from '@dcloudio/uni-app'
 const questions = ref<any[]>([])
 onShow(
   async () => {
-    console.log('首页onShow被调用了');
+    console.log('首页onShow被调用了')
     try {
       const response = await getAllQAPI()
       if (Array.isArray(response)) {

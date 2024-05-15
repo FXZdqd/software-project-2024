@@ -49,7 +49,11 @@ type reportAParams = {
 type usernameParams = {
   username: string
 }
-
+type answerParams = {
+  q_id: number
+  username: string
+  content: string
+}
 /**
  * 提问，添加问题
  * @param data
@@ -117,6 +121,13 @@ export const unlikeQAPI = (data: likeQParams) => {
     data,
   })
 }
+export const unfollowAPI = (data: likeQParams) => {
+  return http({
+    method: 'POST',
+    url: '/unfollow',
+    data,
+  })
+}
 export const likeAAPI = (data: likeAParams) => {
   return http({
     method: 'POST',
@@ -134,20 +145,28 @@ export const unlikeAAPI = (data: likeAParams) => {
 export const reportQAPI = (data: reportQParams) => {
   return http({
     method: 'POST',
-    url: '/ReporQuestion',
+    url: '/reportQuestion',
     data,
   })
 }
 export const reportAAPI = (data: reportAParams) => {
   return http({
     method: 'POST',
-    url: '/ReporAnswer',
+    url: '/reportAnswer',
+    data,
   })
 }
-export const getFollowQAPI = (data: usernameParams) => { 
+export const getFollowQAPI = (data: usernameParams) => {
   return http({
     method: 'POST',
     url: '/user_follow',
+    data,
+  })
+}
+export const goAnswerAPI = (data: answerParams) => {
+  return http({
+    method: 'POST',
+    url: '/goAnswer',
     data,
   })
 }
