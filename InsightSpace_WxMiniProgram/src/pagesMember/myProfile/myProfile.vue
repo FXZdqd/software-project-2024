@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { getAvatarAPI, resetPasswordAPI, setAvatarAPI, reUsernameAPI, getUserAPI, setUserInfoAPI } from '@/services/user'
+import { getAvatarAPI, resetPasswordAPI, setAvatarAPI, 
+  reUsernameAPI, getUserAPI, setUserInfoAPI,  } from '@/services/user'
 import type { ProfileDetail } from '@/types/user'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'

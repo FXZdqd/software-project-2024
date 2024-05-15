@@ -129,3 +129,28 @@ export const deleteUserAPI = (data: deleteUserParams) => {
     data,
   })
 }
+/**
+ * 我的提问
+ * @param data 
+ * @returns 
+ */
+export const getQuestionAskedByUserAPI = (data: usernameParams) => {
+  return http({
+    method: 'POST',
+    url: '/getQuestionAskedByUser',
+    data,
+  })
+}
+
+/**
+ * 我的回答
+ * @param data 
+ * @returns 
+ */
+export const getQuestionAnsweredByUserAPI = (data: usernameParams) => {
+  return http({
+    method: 'POST',
+    url: '/getQuestionAnsweredByUser',
+    data,
+  })
+}

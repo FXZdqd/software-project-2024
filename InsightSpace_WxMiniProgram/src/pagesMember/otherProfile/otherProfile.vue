@@ -2,12 +2,15 @@
 import { useUserStore } from '@/stores'
 import { ref } from 'vue'
 import { getFollowQAPI } from '@/services/question';
-import { getAvatarAPI } from '@/services/user'
+import { getAvatarAPI, getQuestionAskedByUserAPI, getQuestionAnsweredByUserAPI } from '@/services/user'
 import { onMounted } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 const UserStore = useUserStore()
 
 const FollowQ = ref<any[]>([])
+const AskQ = ref<any[]>([])
+const AnsQ = ref<any[]>([])
+
 //获取会员信息
 const userStore = useUserStore()
 const otherUsername = uni.getStorageSync('otherUsername');
@@ -19,6 +22,10 @@ const onClickItem = (e) => {
     current.value = e.currentIndex
     if (current.value == 2) {
       getFollowQ();
+    } else if (current.value == 0) {
+      getQuestionAskedByUser();
+    } else if (current.value == 1) {
+      getQuestionAnsweredByUser();
     }
   }
 }
@@ -38,6 +45,36 @@ const getFollowQ = async () => {
       FollowQ.value = []
     }
     console.log(FollowQ.value);
+  } catch (error) {
+    console.error('There was an error fetching the questions:', error)
+  }
+}
+const getQuestionAskedByUser = async () => {
+  try {
+    const response = await getQuestionAskedByUserAPI({ username: otherUsername })
+    if (Array.isArray(response)) {
+      AskQ.value = response.map((question) => ({
+        ...question
+      }))
+    } else {
+      AskQ.value = []
+    }
+    console.log(AskQ.value);
+  } catch (error) {
+    console.error('There was an error fetching the questions:', error)
+  }
+}
+const getQuestionAnsweredByUser = async () => {
+  try {
+    const response = await getQuestionAnsweredByUserAPI({ username: otherUsername })
+    if (Array.isArray(response)) {
+      AnsQ.value = response.map((question) => ({
+        ...question
+      }))
+    } else {
+      AnsQ.value = []
+    }
+    console.log(AnsQ.value);
   } catch (error) {
     console.error('There was an error fetching the questions:', error)
   }
@@ -109,8 +146,24 @@ onShow(async () => {
       <view class="container">
         <scroll-view class="scroll-view-container" :scroll-y="true" :scroll-top="scrollTop">
           <view class="content">
-            <view v-if="current === 0"><text class="content-text">ta的提问</text></view>
-            <view v-if="current === 1"><text class="content-text">ta的回答</text></view>
+            <view v-if="current === 0">
+              <text class="content-text">
+                <div v-for="question in AskQ" :key="question.q_id" @click="viewInfo(question.q_id)">
+                  <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
+                    <text>{{ question.content }}</text>
+                  </uni-card>
+                </div>
+              </text>
+            </view>
+            <view v-if="current === 1">
+              <text class="content-text">
+                <div v-for="question in AnsQ" :key="question.q_id" @click="viewInfo(question.q_id)">
+                  <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
+                    <text>{{ question.content }}</text>
+                  </uni-card>
+                </div>
+              </text>
+            </view>
             <view v-if="current === 2">
               <view class="content-text">
                 <div v-for="question in FollowQ" :key="question.q_id" @click="viewInfo(question.q_id)">
@@ -223,15 +276,6 @@ page {
   .tips {
     font-size: 22rpx;
   }
-
-  /* .update {
-    padding: 3rpx 10rpx 1rpx;
-    color: rgba(0, 0, 0, 0.8);
-    border: 1rpx solid rgba(0, 0, 0, 0.8);
-    margin-right: 10rpx;
-    border-radius: 30rpx;
-    bottom: 0;
-  } */
 
   .settings {
     position: absolute;
