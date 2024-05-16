@@ -15,11 +15,11 @@ export const log_in = (
   });
 };
 
-export const getAllQuestions = () => {
-  return myAxios.post("/api/getAllQuestion");
+export const getAllQuesByReport = () => {
+  return myAxios.post("/api/getAllQuestionByReport");
 };
-export const getAllUser = () => {
-  return myAxios.post("/api/getAllUser");
+export const getAllUserByReport = () => {
+  return myAxios.post("/api/getAllUserByReport");
 };
 
 export const delQuestion = (q_id: number) => {
@@ -33,9 +33,16 @@ export const delQuestion = (q_id: number) => {
 export const banUser = (username: string) => {
   let params = {
     username: username,
-    is_banned: false,
   };
   return myAxios.post("/api/banUser", params, {
+    headers: { "Content-Type": "application/json" },
+  });
+};
+export const searchUser = (username: string) => {
+  let params = {
+    keyword: username,
+  };
+  return myAxios.post("/api/searchUser", params, {
     headers: { "Content-Type": "application/json" },
   });
 };

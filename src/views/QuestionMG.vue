@@ -34,8 +34,24 @@
               ><!--span slot="label"><span style="color: #f56c6c;font-size: 14px;"> * </span-->
               <span>{{ props.row.content }}</span>
             </el-form-item>
+            <el-form-item style="float: right"
+              ><el-icon><View /></el-icon><span>{{ props.row.views }} </span
+              ><el-icon><StarFilled></StarFilled></el-icon
+              ><span>{{ props.row.likes }}</span>
+              <el-icon><WarnTriangleFilled /></el-icon
+              ><span>{{ props.row.reports }}</span></el-form-item
+            >
+            <el-icon><Comment></Comment></el-icon>
             <el-form-item label="回答：" style="padding-left: 20px">
-              <span>{{ props.row.answer }}</span>
+              <el-form v-for="(val, key) in props.row.answers" :key="key"
+                ><el-form-item> {{ val.user }}</el-form-item>
+                <el-form-item> {{ formatDate(val.date) }}</el-form-item>
+                <el-icon><StarFilled></StarFilled></el-icon
+                ><span>{{ props.row.likes }}</span>
+                <el-icon><WarnTriangleFilled /></el-icon
+                ><span>{{ props.row.reports }}</span>
+                <el-form-item> {{ val.content }}</el-form-item></el-form
+              >
             </el-form-item>
           </el-form>
         </template>
@@ -52,7 +68,7 @@
       >
       <el-table-column label="提问者">
         <template v-slot="scope">{{
-          scope.row.username
+          scope.row.user
         }}</template></el-table-column
       >
       <el-table-column
@@ -77,9 +93,10 @@
           >
         </template>
       </el-table-column>
-      <el-table-column fixed="right" label="操作">
-        <el-button @click.stop="deleteQuestion(props.row.q_id)" type="danger">
-          删除问题<el-icon><delete></delete></el-icon> </el-button
+      <el-table-column fixed="right" label="操作"
+        ><template v-slot="scope">
+          <el-button @click.stop="deleteQuestion(scope.row.q_id)" type="danger">
+            删除问题<el-icon><delete></delete></el-icon> </el-button></template
       ></el-table-column>
       <!--el-link icon="el-icon-view" @click.stop :underline="false"<el-tag size="small">
             ><template v-slot="scope">{{ scope.row.views }} 浏览</template></el-link
@@ -113,7 +130,7 @@ import axios from "axios";
 import { ElButton, ElNotification } from "element-plus";
 // import type { ,TagProps  } from "element-plus";
 import {
-  getAllQuestions,
+  getAllQuesByReport,
   delQuestion,
   GetQuesByKeyword,
   GetQuesByTag,
@@ -123,15 +140,15 @@ const activeNames = ref([]);
 const searchText = ref("");
 const currentPage = ref(1); // 当前页码
 const total = ref(0); // 总条数
-const pageSize = ref(8); // 每页的数据条数
+const pageSize = ref(7); // 每页的数据条数
 
 onMounted(
   async () => {
     try {
-      const response = await getAllQuestions();
+      const response = await getAllQuesByReport();
       console.log(response.data);
-      if (Array.isArray(response.data)) {
-        questions.value = response.data.map((question) => ({
+      if (Array.isArray(response.data.questions)) {
+        questions.value = response.data.questions.map((question) => ({
           ...question,
         }));
         total.value = questions.value.length;
@@ -174,9 +191,9 @@ const deleteQuestion = async (id) => {
     const response = await delQuestion(id);
     if (response.data.value === 0) {
       console.log(`Delete question ${id}. (Not implemented)`);
-      const response = await getAllQuestions();
-      if (Array.isArray(response.data)) {
-        questions.value = response.data.map((question) => ({
+      const response = await getAllQuesByReport();
+      if (Array.isArray(response.data.questions)) {
+        questions.value = response.data.questions.map((question) => ({
           ...question,
         }));
         total.value = questions.value.length;
@@ -234,9 +251,10 @@ const handleSearch = async () => {
   }
 };
 const handleClear = async () => {
-  const response = await getAllQuestions();
-  if (Array.isArray(response.data)) {
-    questions.value = response.data.map((question) => ({
+  const response = await getAllQuesByReport();
+
+  if (Array.isArray(response.data.questions)) {
+    questions.value = response.data.questions.map((question) => ({
       ...question,
     }));
     total.value = questions.value.length;
