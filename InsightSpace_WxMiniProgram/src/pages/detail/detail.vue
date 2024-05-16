@@ -29,7 +29,7 @@
         <image v-if="question.username !== name" class="report-icon" src="/static/images/report1.png"
           @tap="toggleReportQ">
         </image>
-        <image v-else class="report-icon" src="/static/images/delete.png" @tap="toggleDeleteQ(question.a_id - 1)">
+        <image v-else class="report-icon" src="/static/images/delete.png" @tap="toggleDeleteQ">
         </image>
         <image class="like-icon" :src="likeIconSrc" @tap="toggleLikeQ"></image>
         <image class="follow-icon" :src="followIconSrc" @tap="togglefollow"></image>
@@ -69,12 +69,12 @@
         <view class="like-dislike">
           <icon>
             <image v-if="answer.username !== name" class="reportA-icon" src="/static/images/report1.png"
-              @tap="toggleReportA(answer.a_id - 1)">
+              @tap="toggleReportA(answer.a_id)">
             </image>
-            <image v-else class="reportA-icon" src="/static/images/delete.png" @tap="toggleDeleteA(answer.a_id - 1)">
+            <image v-else class="reportA-icon" src="/static/images/delete.png" @tap="toggleDeleteA(answer.a_id)">
             </image>
             <image class="likeA-icon" :src="answer.is_liked ? '/static/images/liked.png' : '/static/images/like.png'"
-              @tap="toggleLikeA(answer.a_id - 1)">
+              @tap="toggleLikeA(answer.a_id)">
             </image>
           </icon>
         </view>
@@ -118,9 +118,9 @@ const question = ref({
   is_liked: Boolean,
   is_followed: Boolean,
 })
-onMounted(() => {
-  getDetails()
-})
+
+
+
 const handleAnswer = () => {
   popup.value.open()
 }
@@ -196,7 +196,7 @@ const getDetails = async () => {
     followIconSrc.value = '/static/images/follow.png'
   }
 }
-
+getDetails()
 const likeIconSrc = ref('/static/images/like.png')
 const followIconSrc = ref('/static/images/follow.png')
 const reportIconSrc = ref('/static/images/report1.png')
@@ -231,14 +231,15 @@ const toggleSee = (name) => {
 
 const toggleLikeA = (id) => {
   console.log('处理回答id的点赞功能:', id)
-  if (question.value.answers[id].is_liked) {
+  const len = question.value.answers.length
+  if (question.value.answers[id - len].is_liked) {
     //取消点赞
-    unlikeA(id + 1)
-    question.value.answers[id].is_liked = false
+    unlikeA(id)
+    question.value.answers[id - len].is_liked = false
   } else {
     //点赞
-    likeA(id + 1)
-    question.value.answers[id].is_liked = true
+    likeA(id)
+    question.value.answers[id - len].is_liked = true
   }
 }
 
@@ -307,7 +308,7 @@ const toggleDeleteA = (id) => {
     success: function (res) {
       if (res.confirm) {
         console.log('用户点击确定')
-        delA(id + 1)
+        delA(id)
       } else if (res.cancel) {
         console.log('用户点击取消')
       }
@@ -377,7 +378,7 @@ const toggleReportA = (id) => {
             if (res.confirm) {
               //用户点击确定，提交举报理由
               console.log('用户提交了举报理由：', res.content)
-              reportA(id + 1)
+              reportA(id)
               uni.showToast({
                 icon: 'success',
                 title: '举报成功',
