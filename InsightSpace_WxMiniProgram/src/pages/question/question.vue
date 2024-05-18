@@ -2,7 +2,6 @@
 import { createQAPI } from '@/services/question'
 import { onMounted, ref } from 'vue'
 import { useUserStore } from '@/stores'
-import Editor from './components/editor.vue'
 const UserStore = useUserStore()
 
 const createQdata = ref({

@@ -146,12 +146,7 @@ onShow(async () => {
       <!-- <uni-section class="section"> -->
       <view class="uni-divider" />
       <view class="uni-padding-wrap uni-common-mt">
-        <uni-segmented-control
-          :current="current"
-          :values="items"
-          style-type="text"
-          @clickItem="onClickItem"
-        />
+        <uni-segmented-control :current="current" :values="items" style-type="text" @clickItem="onClickItem" />
       </view>
       <view class="uni-divider" />
       <view class="container">
@@ -160,12 +155,8 @@ onShow(async () => {
             <view v-if="current === 0">
               <view class="content-text">
                 <div v-for="question in AskQ" :key="question.q_id" @click="viewInfo(question.q_id)">
-                  <uni-card
-                    :title="question.title"
-                    :sub-title="question.username"
-                    :extra="formatDate(question.date)"
-                  >
-                    <text>{{ question.content }}</text>
+                  <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
+                    <text class="limit-lines">{{ question.content }}</text>
                   </uni-card>
                 </div>
               </view>
@@ -173,29 +164,17 @@ onShow(async () => {
             <view v-if="current === 1">
               <view class="content-text">
                 <div v-for="question in AnsQ" :key="question.q_id" @click="viewInfo(question.q_id)">
-                  <uni-card
-                    :title="question.title"
-                    :sub-title="question.username"
-                    :extra="formatDate(question.date)"
-                  >
-                    <text>{{ question.content }}</text>
+                  <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
+                    <text class="limit-lines">{{ question.content }}</text>
                   </uni-card>
                 </div>
               </view>
             </view>
             <view v-if="current === 2">
               <view class="content-text">
-                <div
-                  v-for="question in FollowQ"
-                  :key="question.q_id"
-                  @click="viewInfo(question.q_id)"
-                >
-                  <uni-card
-                    :title="question.title"
-                    :sub-title="question.username"
-                    :extra="formatDate(question.date)"
-                  >
-                    <text>{{ question.content }}</text>
+                <div v-for="question in FollowQ" :key="question.q_id" @click="viewInfo(question.q_id)">
+                  <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
+                    <text class="limit-lines">{{ question.content }}</text>
                   </uni-card>
                 </div>
               </view>
@@ -344,5 +323,12 @@ page {
   margin-top: 5px;
   margin-bottom: 25px;
   color: #b7b7b7;
+}
+
+.limit-lines {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
 }
 </style>
