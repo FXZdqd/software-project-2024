@@ -68,7 +68,7 @@
         <!-- 点赞和踩按钮 -->
         <view class="like-dislike">
           <icon>
-            <image class="likeA-icon" :src="answer.is_liked ? '/static/images/liked.png' : '/static/images/like.png'"
+            <image class="likeA-icon" :src="likeIconSrcA"
               @tap="toggleLikeA(answer.a_id, answer.is_liked, answer.username)">
             </image>
             <image v-if="answer.username !== name" class="reportA-icon" src="/static/images/report1.png"
@@ -195,6 +195,7 @@ const getDetails = async () => {
 }
 getDetails()
 const likeIconSrc = ref('/static/images/like.png')
+const likeIconSrcA = ref('/static/images/like.png')
 const followIconSrc = ref('/static/images/follow.png')
 const reportIconSrc = ref('/static/images/report1.png')
 const toggleSee = (name) => {
@@ -217,16 +218,29 @@ const toggleLikeQ = () => {
     : '/static/images/like.png'
   console.log('2', likeIconSrc.value)
 }
+const flag = ref(true)
 const toggleLikeA = (id, is_liked, name) => {
   console.log('处理回答id的点赞功能:', id)
-  if (is_liked) {
-    //取消点赞
-    unlikeA(id, name)
+  if (flag.value) {
+    if (is_liked) {
+      //取消点赞
+      unlikeA(id, name)
+      question.value.answers[id].is_liked = false
+    } else {
+      //点赞
+      likeA(id, name)
+    }
+    flag.value = false
   } else {
-    //点赞
-    likeA(id, name)
+    if (is_liked) {
+      //点赞
+      likeA(id, name)
+    } else {
+      //取消点赞
+      unlikeA(id, name)
+    }
+    flag.value = true
   }
-  getDetails()
 }
 const togglefollow = () => {
   console.log(question.value.is_followed)

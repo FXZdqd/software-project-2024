@@ -2,14 +2,13 @@
 import { createQAPI } from '@/services/question'
 import { onMounted, ref } from 'vue'
 import { useUserStore } from '@/stores'
-import Editor from './components/editor.vue'
 const UserStore = useUserStore()
 
 const createQdata = ref({
   title: '',
   content: '',
   username: UserStore.profile.username,
-  tags: []
+  tags: [],
 })
 
 const rule = () => {
@@ -29,7 +28,7 @@ const rule = () => {
 }
 
 const addQ = async () => {
-  console.log(createQdata.value);
+  console.log(createQdata.value)
 
   let result = await createQAPI(createQdata.value)
 
@@ -51,7 +50,7 @@ const clearCreateQData = () => {
     title: '',
     content: '',
     username: UserStore.profile.username,
-    tags: []
+    tags: [],
   }
 }
 const checkbox1 = ref([0])
@@ -62,11 +61,10 @@ const catelist = ref([
   { text: '升学', value: 'further_study' },
   { text: '其他', value: 'other' },
 ])
-const onTagsChange : UniHelper.CheckboxGroupOnChange = (ev) =>{
+const onTagsChange: UniHelper.CheckboxGroupOnChange = (ev) => {
   createQdata.value.tags = ev.detail.value
-  console.log(createQdata.value.tags);
+  console.log(createQdata.value.tags)
 }
-
 </script>
 
 <template>
