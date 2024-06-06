@@ -159,7 +159,7 @@ onShow(async () => {
               <view class="content-text">
                 <div v-for="question in AskQ" :key="question.q_id" @click="viewInfo(question.q_id)">
                   <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
-                    <text>{{ question.content }}</text>
+                    <text class="limit-lines">{{ question.content }}</text>
                   </uni-card>
                 </div>
               </view>
@@ -168,7 +168,7 @@ onShow(async () => {
               <view class="content-text">
                 <div v-for="question in AnsQ" :key="question.q_id" @click="viewInfo(question.q_id)">
                   <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
-                    <text>{{ question.content }}</text>
+                    <text class="limit-lines">{{ question.content }}</text>
                   </uni-card>
                 </div>
               </view>
@@ -177,7 +177,7 @@ onShow(async () => {
               <view class="content-text">
                 <div v-for="question in FollowQ" :key="question.q_id" @click="viewInfo(question.q_id)">
                   <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
-                    <text>{{ question.content }}</text>
+                    <text class="limit-lines">{{ question.content }}</text>
                   </uni-card>
                 </div>
               </view>
@@ -320,6 +320,7 @@ page {
 
 .down {
   opacity: 0.8;
+  height: 1000px;
   background-color: #ffffff;
 }
 
@@ -338,5 +339,12 @@ page {
   margin-top: 5px;
   margin-bottom: 25px;
   color: #b7b7b7
+}
+
+.limit-lines {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
 }
 </style>
