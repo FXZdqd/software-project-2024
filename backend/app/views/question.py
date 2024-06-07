@@ -96,52 +96,31 @@ class GetAllQuestions(APIView):
                 'username': question.user.username,
                 'date': question.date,
                 'tags': tag_names,
+                'views': question.views,
+                'likes': question.likes,
                 'answers': answer_data  # Include answers in the response
             })
         return Response(return_data)
 
-import base64
-def changePicPath(path):
-    with open(path, "rb") as image_file:
-        image_data = image_file.read()
-        base64_encoded_data = base64.b64encode(image_data)
-        base64_message = base64_encoded_data.decode('utf-8')
-        return base64_message
+
 class GetQuestion(APIView):
     def post(self, req: Request):
         data = req.data
         q_id = data['q_id']
         username = data['username']
-
-        try:
-            question = Question.objects.get(id=q_id)
-            user = User.objects.get(username=username)
-        except Question.DoesNotExist:
-            return Response({"error": "Question not found"}, status=404)
-        except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=404)
-
+        question = Question.objects.get(id=q_id)
         answers = question.answers.all()
         tags = question.tags.all()
         tag_names = [tag.name for tag in tags]
-
-        def get_avatar_base64(user):
-            try:
-                avatar = Avator.objects.get(user=user)
-                return avatar.file.url
-            except Avator.DoesNotExist:
-                return None
-
+        user = User.objects.get(username=username)
         answer_data = [{
             'a_id': answer.id,
             'content': answer.content,
             'username': answer.user.username,
             'date': answer.date,
             'likes': answer.likes,
-            'is_liked': UserLikeAnswer.objects.filter(user=user, answer=answer).exists(),
-            'url': get_avatar_base64(answer.user)
+            'is_liked':UserLikeAnswer.objects.filter(user=user,answer=answer).exists()
         } for answer in answers]
-
         return_data = {
             'q_id': question.id,
             'title': question.title,
@@ -149,12 +128,13 @@ class GetQuestion(APIView):
             'username': question.user.username,
             'date': question.date,
             'tags': tag_names,
-            'is_liked': UserLikeQuestion.objects.filter(user=user, question=question).exists(),
-            'is_followed': UserFollowedQuestion.objects.filter(user=user, question=question).exists(),
-            'answers': answer_data,
-            'url': get_avatar_base64(question.user)
+            'likes': question.likes,
+            'views': question.views,
+            'answer_count': answers.count(),
+            'is_liked':UserLikeQuestion.objects.filter(user=user, question=question).exists(),
+            'is_followed':UserFollowedQuestion.objects.filter(user=user, question=question).exists(),
+            'answers': answer_data
         }
-
         return Response(return_data)
 
 class ViewQuestion(APIView):
@@ -250,4 +230,3 @@ class ReportQuestion(APIView):
             return Response({"error": "Question not found."}, status=status.HTTP_404_NOT_FOUND)
         except IntegrityError:
             return Response({"error": "Could not process report."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
