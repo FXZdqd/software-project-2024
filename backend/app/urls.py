@@ -42,9 +42,10 @@ urlpatterns = [
     path('unlikeAnswer', answer.UnlikeAnswer.as_view()),
     path('checkUserlikeAnswer', answer.CheckUserLikeAnswer.as_view()),
     path('reportAnswer', answer.ReportAnswer.as_view()),
+    path('delAnswer', answer.DelAnswer.as_view()),
     # 关注功能
     path('follow', follow.AddFollowQuestion.as_view()),
-    path('unfollow',follow.UnfollowQuestion.as_view()),
+    path('unfollow', follow.UnfollowQuestion.as_view()),
     path('user_follow', follow.GetUserFollowedQuestions.as_view()),
 
     # 搜索功能
@@ -57,4 +58,4 @@ urlpatterns = [
     path('getAllQuestionByReport', search.GetAllQuestionByReport.as_view()),
     # path('getQuestionByTagUser', search.GetQuestionsByTagUser.as_view()),
     # path('getQuestionByKeywordUser', search.GetQuestionsByTagUser.as_view())
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

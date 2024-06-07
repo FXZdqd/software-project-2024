@@ -258,32 +258,61 @@ class SetAvatar(APIView):
             'value': value,
             'avator_id': avator_id,
         })
+def changePicPath(path):
+    with open(path, "rb") as image_file:
+        image_data = image_file.read()
+        base64_encoded_data = base64.b64encode(image_data)
+        base64_message = base64_encoded_data.decode('utf-8')
+        return base64_message
 
-
+# class GetAvatar(APIView):
+#     def post(self, req: Request):
+#         username = req.data['username']
+#         path = ''
+#         user = User.objects.get(username=username)
+#         value = -1
+#         if not Avator.objects.filter(user=user).exists():
+#             return Response({
+#                 'value': value,
+#                 'path': None,
+#                 'base64': None
+#             })
+#         try:
+#             pic = Avator.objects.get(user=user)
+#             path = pic.file.path
+#             value = 0
+#         except Exception as e:
+#             print(e)
+#             value = 1
+#         return Response({
+#             'value': value,
+#             'path': path,
+#             'base64': changePicPath(path)
+#         })
 class GetAvatar(APIView):
     def post(self, req: Request):
         username = req.data['username']
-        path = ''
-        user = User.objects.get(username=username)
-        value = -1
-        if not Avator.objects.filter(user=user).exists():
-            return Response({
-                'value': value,
-                'path': None,
-                'base64': None
-            })
+
+        if not username:
+            return Response({"error": "Missing 'username' parameter."}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            pic = Avator.objects.get(user=user)
-            path = pic.file.path
-            value = 0
-        except Exception as e:
-            print(e)
-            value = 1
-        return Response({
-            'value': value,
-            'path': path,
-            'base64': changePicPath(path)
-        })
+            user = User.objects.get(username=username)
+            avatar = Avator.objects.filter(user=user).first()
+
+            if avatar:
+                return Response({
+                    'value': 0,
+                    'url': avatar.file.url
+                })
+            else:
+                return Response({
+                    'value': -1,  # 没有头像
+                    'url': None
+                })
+
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
 class SetUserInfo(APIView):

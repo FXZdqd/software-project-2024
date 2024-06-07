@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import rest_framework.status
-from app.models import Question, Tag, UserLikeQuestion, UserFollowedQuestion, User, UserLikeAnswer, Answer,Avator
+from app.models import Question, Tag, UserLikeQuestion, UserFollowedQuestion, User, UserLikeAnswer, Answer, Avator
 from django.db.models import Q, Case, When, Value, IntegerField
 from django.db.models import Case, When, Value, IntegerField
 
@@ -281,15 +281,19 @@ class GetQuestionByKeyword(APIView):
 
         return Response(data)
 
+
 import base64
+
+
 def changePicPath(path):
     with open(path, "rb") as image_file:
         # 读取文件
         image_data = image_file.read()
         base64_encoded_data = base64.b64encode(image_data)
-        # 将Base64编码的数据转换为字符串
         base64_message = base64_encoded_data.decode('utf-8')
         return base64_message
+
+
 class SearchUser(APIView):
     def post(self, req):
         keyword = req.data.get('keyword')
@@ -298,10 +302,7 @@ class SearchUser(APIView):
             return Response({"error": "Missing 'keyword' parameter."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # 使用icontains进行不区分大小写的模糊匹配
             users = User.objects.filter(username__icontains=keyword)
-
-            # 构造用户信息列表
             user_info_list = []
             for user in users:
                 user_info = {
@@ -315,20 +316,17 @@ class SearchUser(APIView):
                     'department': user.department,
                     # 其他字段依次添加
                 }
-
-                # 获取用户头像并转换为base64编码
                 try:
                     avatar = Avator.objects.get(user=user)
-                    user_info['base64'] = changePicPath(avatar.file.path)
+                    user_info['url'] = avatar.file.url
                 except Avator.DoesNotExist:
-                    user_info['base64'] = None
+                    user_info['url'] = None
 
                 user_info_list.append(user_info)
 
             return Response({"users": user_info_list})
         except User.DoesNotExist:
             return Response({"error": "No users found matching the keyword."}, status=status.HTTP_404_NOT_FOUND)
-
 
 
 class GetQuestionByKeyword(APIView):
@@ -446,12 +444,11 @@ class GetQuestionAnsweredByUser(APIView):
 
         return Response(data)
 
+
 class GetAllUserByReport(APIView):
     def post(self, request):
-        # 获取所有用户，并按照报告数量从高到低排序
         all_users = User.objects.all().order_by('-reports')
 
-        # 构造用户信息列表
         user_info_list = []
         for user in all_users:
             user_info = {
@@ -472,14 +469,15 @@ class GetAllUserByReport(APIView):
 
 class GetAllQuestionByReport(APIView):
     def post(self, request):
-        # 获取所有问题，并按照报告数量从高到低排序
         all_questions = Question.objects.all().order_by('-reports')
 
-        # 构造问题信息列表
         questions_info_list = []
         for question in all_questions:
+            tags = question.tags.all()
+            tag_names = [tag.name for tag in tags]
             # 构造问题信息
             question_info = {
+                'user': question.user.username,
                 'q_id': question.id,
                 'title': question.title,
                 'content': question.content,
@@ -487,10 +485,11 @@ class GetAllQuestionByReport(APIView):
                 'reports': question.reports,
                 'likes': question.likes,
                 'views': question.views,
+                'tags': tag_names
                 # 其他字段依次添加
             }
 
-            # 获取问题的所有回答，并按照报告数量从高到低排序
+
             answers = question.answers.all().order_by('-reports')
 
             # 构造回答信息列表
@@ -502,7 +501,6 @@ class GetAllQuestionByReport(APIView):
                     'user': answer.user.username,
                     'likes': answer.likes,
                     'reports': answer.reports,
-                    # 其他字段依次添加
                 }
                 answers_info_list.append(answer_info)
 
@@ -513,4 +511,3 @@ class GetAllQuestionByReport(APIView):
             questions_info_list.append(question_info)
 
         return Response({"questions": questions_info_list})
-

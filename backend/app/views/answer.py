@@ -61,6 +61,17 @@ class LikeAnswer(APIView):
         except IntegrityError:
             return Response({"error": "Could not process like."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class DelAnswer(APIView):
+    def post(self, req: Request):
+        a_id = req.data['a_id']  # Answer ID from the request
+        try:
+            answer = Answer.objects.get(id=a_id)
+            if answer is None:
+                return Response({"error": "Answer Not Found"}, status=status.HTTP_404_NOT_FOUND)
+            answer.delete()
+            return Response({"message": "Answer delete successfully."}, status=status.HTTP_200_OK)
+        except IntegrityError:
+            return Response({"error": "Could not process like."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UnlikeAnswer(APIView):
     def post(self, req: Request):
