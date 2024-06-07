@@ -6,8 +6,10 @@ import {
   getAvatarAPI,
   getQuestionAskedByUserAPI,
   getQuestionAnsweredByUserAPI,
+  getUserAPI,
 } from '@/services/user'
 import { onMounted } from 'vue'
+import type { ProfileDetail } from '@/types/user'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 const UserStore = useUserStore()
 
@@ -33,6 +35,27 @@ const onClickItem = (e) => {
     }
   }
 }
+
+const profile = ref<ProfileDetail>({
+  username: otherUsername,
+  phone: 0,
+  is_admin: false,
+  is_banned: false,
+  reports: 0,
+  gender: '',
+  grade: '',
+  department: ''
+})
+const getUserProfileData = async () => {
+  try {
+    const res = await getUserAPI({ username: otherUsername })
+    profile.value = res;
+    console.log('用户信息为', profile.value);
+  } catch (error) {
+    console.error('There was an error fetching the questions:', error)
+  }
+}
+getUserProfileData()
 
 const scrollTop = ref(0)
 
@@ -106,13 +129,16 @@ const getAvatar = async () => {
   let data = await getAvatarAPI({ username: otherUsername })
   if (data.value == 0) {
     isphoto.value = true
-    photo.value = data.base64
+    photo.value = 'http://39.109.126.173:39001/api' + data.url
   }
 }
 getAvatar()
 
 onShow(async () => {
+  getFollowQ
   getAvatar
+  getQuestionAskedByUser
+  getQuestionAnsweredByUser
   console.log('onshow被调用了')
 })
 </script>
@@ -122,22 +148,16 @@ onShow(async () => {
     <image class="background-image" src="/static/images/my_bg.jpg" mode="aspectFill" />
     <!-- 个人资料 -->
     <view class="profile" :style="{ paddingTop: safeAreaInsets!.top + 'px' }">
-      <view class="overview" v-if="isphoto">
-        <navigator url="/pagesMember/myProfile/myProfile" hover-class="none">
-          <image class="avatar" mode="aspectFill" :src="'data:image/jpeg;base64,' + photo"></image>
-        </navigator>
+      <view class="overview">
+        <image class="avatar" mode="aspectFill" :src="isphoto ? photo : '../../../static/images/avatar1.png'"></image>
         <view class="meta">
           <view class="nickname">{{ otherUsername }}</view>
+          <view class="grade">{{ profile.grade }}级</view>
+          <view class="department">{{ profile.department }}</view>
         </view>
       </view>
-      <view class="overview" v-else>
-        <navigator url="/pagesMember/myProfile/myProfile" hover-class="none">
-          <image class="avatar" mode="aspectFill" src="../../../static/images/avatar1.png"></image>
-        </navigator>
-        <view class="meta">
-          <view class="nickname">{{ otherUsername }}</view>
-        </view>
-      </view>
+
+
     </view>
     <!-- 分割线 -->
     <!-- <view class="uni-divider" /> -->
@@ -269,6 +289,10 @@ page {
     margin-bottom: 35rpx;
     font-size: 50rpx;
     white-space: nowrap;
+  }
+
+  .grade {
+    margin-bottom: 5rpx;
   }
 
   .extra {

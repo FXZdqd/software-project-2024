@@ -20,10 +20,15 @@ const getAvatar = async () => {
   let data = await getAvatarAPI({ username: userStore.profile.username });
   if (data.value == 0) {
     isphoto.value = true
-    photo.value = data.base64;
+    photo.value = 'http://39.109.126.173:39001/api' + data.url;
+
+  } else {
+    console.log('获取头像失败');
   }
 }
 getAvatar();
+
+
 
 let filePath = ''
 const setAvatar = async () => {
@@ -59,6 +64,34 @@ const setAvatar = async () => {
     console.error('图片选择失败', error);
   }
 }
+/* const setAvatar = () =>{
+  uni.chooseMedia({
+    count: 1,
+    mediaType: ['image'],
+    success: (res) => {
+      const { tempFilePath } = res.tempFiles[0]
+      uni.uploadFile({
+        url: 'http://39.109.126.173:39001/api/setAvatar', 
+        name: 'photo',
+        filePath: tempFilePath,
+        success: (res) => {
+          // 判断状态码是否上传成功
+          if (res.statusCode === 200) {
+            // 提取头像
+            const { avatar } = JSON.parse(res.data).result
+            getAvatar
+            uni.showToast({ icon: 'success', title: '更新成功' })
+          } else {
+            uni.showToast({ icon: 'error', title: '出现错误' })
+          }
+        },
+        fail: (err) => {
+            console.error('上传失败:', err);
+          }
+      })
+    },
+  })
+} */
 
 
 const isProfile = ref(true)
@@ -113,6 +146,7 @@ const setUserInfo = async () => {
 const onGenderChange: UniHelper.RadioGroupOnChange = (ev) => {
   profile.value.gender = ev.detail.value
 }
+
 
 const rePwdData = ref({
   username: userStore.profile.username,
@@ -195,6 +229,59 @@ const reUsername = async () => {
   }
 }
 
+
+const years = ref(Array.from({ length: new Date().getFullYear() - 2010 + 1 }, (_, i) => (2010 + i).toString()));
+const onYearChange: UniHelper.RegionPickerOnChange = (ev) => {
+  profile.value.grade = years.value[ev.detail.value]
+  console.log('设置年级', profile.value.grade);
+}
+
+
+const departments = ref([
+  '01 材料科学与工程学院',
+  '02 电子信息工程学院',
+  '03 自动化科学与电气工程学院',
+  '04 能源与动力工程学院',
+  '05 航空科学与工程学院',
+  '06 计算机学院',
+  '07 机械工程及自动化学院',
+  '08 经济管理学院',
+  '09 数学科学学院',
+  '10 生物医学与工程学院',
+  '11 人文社会科学学院',
+  '12 外国语学院',
+  '13 交通科学与工程学院',
+  '14 可靠性与系统工程学院',
+  '15 宇航学院',
+  '16 飞行学院',
+  '17 仪器科学与光电工程学院',
+  '18 北京学院',
+  '19 物理学院',
+  '20 法学院',
+  '21 软件学院',
+  '23 未来空天技术学院/高等理工学院',
+  '24 中法工程师学院',
+  '25 国际学院',
+  '26 新媒体艺术与设计学院',
+  '27 化学学院',
+  '28 马克思主义学院',
+  '29 人文与社会科学高等研究院',
+  '30 空间与环境学院',
+  '31 无人机系统研究院',
+  '32 航空发动机研究院',
+  '35 国际通用工程学院',
+  '37 北航学院',
+  '38 医学科学与工程学院',
+  '39 网络空间安全学院',
+  '41 集成电路科学与工程学院',
+  '42 人工智能研究院',
+  '43 前沿科学技术创新研究院',
+])
+const onDepartmentChange: UniHelper.RegionPickerOnChange = (ev) => {
+  profile.value.department = departments.value[ev.detail.value]
+  console.log('设置院系：', profile.value.department);
+}
+
 </script>
 
 <template>
@@ -206,9 +293,9 @@ const reUsername = async () => {
     </view>
     <!-- 头像 -->
     <view class="avatar">
-      <view class="avatar-content" @click="setAvatar()" v-if="isphoto">
-        <image class="image" :src="'data:image/jpeg;base64,' + photo" mode="aspectFill" />
-        <view class="text">点击修改头像</view>
+      <view class="avatar-content" v-if="isphoto">
+        <image class="image" :src="photo" mode="aspectFill" />
+        <view class="text" @click="setAvatar()">点击修改头像</view>
       </view>
       <view class="avatar-content" @click="setAvatar()" v-else>
         <image class="image" src="../../../static/images/avatar1.png" mode="aspectFill" />
@@ -238,11 +325,22 @@ const reUsername = async () => {
         </view>
         <view class="form-item">
           <text class="label">年级</text>
-          <input class="input" type="text" placeholder="请填写年级" v-model="profile.grade" />
+          <!-- <input class="input" type="text" placeholder="请填写年级" v-model="profile.grade" /> -->
+          <picker mode="selector" :range="years" :value="profile?.grade" @change="onYearChange">
+            <view v-if="profile?.grade">{{ profile.grade }}</view>
+            <view class="placeholder" v-else>请选择年级</view>
+          </picker>
+
         </view>
         <view class="form-item">
           <text class="label">院系</text>
-          <input class="input" type="text" placeholder="请填写院系" v-model="profile.department" />
+          <!-- <input class="input" type="text" placeholder="请填写院系" v-model="profile.department" /> -->
+          <picker class="picker" :value="profile?.department" mode="selector" :range="departments"
+            @change="onDepartmentChange">
+            <view v-if="profile?.department">{{ profile.department }}</view>
+            <view class="placeholder" v-else>请选择院系</view>
+          </picker>
+
         </view>
       </view>
       <view class="form">
