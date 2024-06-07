@@ -103,7 +103,7 @@ const getAvatar = async () => {
   let data = await getAvatarAPI({ username: userStore.profile.username });
   if (data.value == 0) {
     isphoto.value = true;
-    photo.value = data.base64;
+    photo.value = 'http://39.109.126.173:39001/api' + data.url;
   } else {
     console.log('用户未设置头像');
   }
@@ -123,10 +123,9 @@ onShow(async () => {
     <image class="background-image" src="/static/images/my_bg.jpg" mode="aspectFill" />
     <!-- 个人资料 -->
     <view class="profile" :style="{ paddingTop: safeAreaInsets!.top + 'px' }">
-
       <view class="overview" v-if="isphoto">
         <navigator url="/pagesMember/myProfile/myProfile" hover-class="none" @click="getAvatar">
-          <image class="avatar" mode="aspectFill" :src="('data:image/jpeg;base64,' + photo)" />
+          <image class="avatar" mode="aspectFill" :src="photo" />
         </navigator>
         <view class="meta">
           <view class="nickname">{{ UserStore.profile.username }}</view>
