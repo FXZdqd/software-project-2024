@@ -16,30 +16,37 @@
 
     <!--标签-->
     <view class="row">
-      <view class="col" v-for="(tag, index) in question.tags" :key="index">
-        <uni-tag class="tag" :inverted="true" :text="tagname(tag)" :type="getTagType(tag)" />
-      </view>
+      <!--view class="col"-->
+      <uni-tag class="tag" :inverted="true" :text="tagname(tag)" :type="getTagType(tag)"
+        v-for="(tag, index) in question.tags" :key="index" size="mini" />
     </view>
 
     <b></b>
     <!-- 问题内容 -->
     <view class="qcontent">
       <text>{{ question.content }}</text>
-      <icon>
-        <image v-if="question.username !== name" class="report-icon" src="/static/images/report1.png"
-          @tap="toggleReportQ">
-        </image>
-        <image v-else class="report-icon" src="/static/images/delete.png" @tap="toggleDeleteQ">
-        </image>
-        <image class="like-icon" :src="likeIconSrc" @tap="toggleLikeQ"></image>
-        <image class="follow-icon" :src="followIconSrc" @tap="togglefollow"></image>
-      </icon>
+      <view>
+        <icon>
+          <image v-if="question.username !== name" class="report-icon" src="/static/images/report1.png"
+            @tap="toggleReportQ">
+          </image>
+          <image v-else class="report-icon" src="/static/images/delete.png" @tap="toggleDeleteQ">
+          </image>
+          <image class="like-icon" :src="likeIconSrc" @tap="toggleLikeQ"></image>
+          <image class="follow-icon" :src="followIconSrc" @tap="togglefollow"></image>
+        </icon>
+      </view>
+      <view class="questiondata">
+        <text>10次浏览 |
+          2个回答&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&nbsp;12</text>
+      </view>
     </view>
 
     <b></b>
     <view>
-      <button class="button" type="primary" plain="true" @click="handleAnswer">
-        <text class="button-text">去回答</text>
+      <button class="button" type="default" style="color: #20afd2; bordercolor: #20afd2" plain="true"
+        @click="handleAnswer">
+        <text>去回答</text>
       </button>
     </view>
     <view>
@@ -77,6 +84,9 @@
             <image v-else class="reportA-icon" src="/static/images/delete.png" @tap="toggleDeleteA(answer.a_id)">
             </image>
           </icon>
+        </view>
+        <view class="likenum">
+          <text>{{ answer.likes }}</text>
         </view>
       </view>
     </view>
@@ -134,6 +144,7 @@ const goAnswer = async () => {
     username: UserStore.profile.username,
   })
   console.log(res)
+  getDetails()
 }
 
 const getTagType = (tag) => {
@@ -207,10 +218,12 @@ const toggleLikeQ = () => {
     //取消点赞
     unlikeQ()
     question.value.is_liked = false
+    question.value.likes = question.value.likes - 1
   } else {
     //点赞
     likeQ()
     question.value.is_liked = true
+    question.value.likes = question.value.likes + 1
   }
   likeIconSrc.value = question.value.is_liked
     ? '/static/images/liked.png'
@@ -435,21 +448,21 @@ function formatDate(dateString) {
 .likeA-icon {
   width: 25px;
   height: 25px;
-  margin-left: 260px;
+  margin-left: 280px;
 }
 
 .reportA-icon {
   width: 25px;
   height: 25px;
-  margin-right: 10px;
-  margin-left: 13px;
+  margin-right: 5px;
+  margin-left: 15px;
 }
 
 .report-icon {
   width: 25px;
   height: 25px;
   margin-right: 10px;
-  margin-left: 200px;
+  margin-left: 240px;
 }
 
 .icon {
@@ -474,13 +487,16 @@ function formatDate(dateString) {
   font-size: 21px;
   margin-left: 5%;
   position: relative;
+  width: 340px;
+  word-wrap: break-word;
+  word-break: normal;
 }
 
 .qcontent {
   font-size: 16px;
   margin-left: 5%;
+  margin-right: 4%;
   position: relative;
-  right: 10px;
 }
 
 .qdate {
@@ -489,13 +505,15 @@ function formatDate(dateString) {
 }
 
 .tag {
-  width: 30px;
-  height: 7px;
+  /* width: 30px;
+  height: 4px; */
+  margin-right: 3px;
+  margin-left: 3px;
 }
 
 .row {
-  display: flex;
-  width: 35%;
+  /* display: flex; */
+  /* width: 35%; */
   margin-top: 5px;
   margin-bottom: 10px;
   margin-left: 5px;
@@ -503,5 +521,31 @@ function formatDate(dateString) {
 
 .col {
   flex: 1;
+}
+
+.likenum {
+  font-size: 12px;
+  color: rgb(142, 142, 144);
+  margin-left: 288px;
+}
+
+.likeQnum {
+  font-size: 12px;
+  color: rgb(142, 142, 144);
+}
+
+.questiondata {
+  font-size: 12px;
+  color: rgb(142, 142, 144);
+  margin-left: 2px;
+  margin-bottom: 5px;
+}
+
+.button {
+  width: 370px;
+  height: 40px;
+  font-size: 16px;
+  align-items: center;
+  justify-content: center;
 }
 </style>
