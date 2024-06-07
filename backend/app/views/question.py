@@ -96,6 +96,8 @@ class GetAllQuestions(APIView):
                 'username': question.user.username,
                 'date': question.date,
                 'tags': tag_names,
+                'views': question.views,
+                'likes': question.likes,
                 'answers': answer_data  # Include answers in the response
             })
         return Response(return_data)
@@ -126,6 +128,9 @@ class GetQuestion(APIView):
             'username': question.user.username,
             'date': question.date,
             'tags': tag_names,
+            'likes': question.likes,
+            'views': question.views,
+            'answer_count': answers.count(),
             'is_liked':UserLikeQuestion.objects.filter(user=user, question=question).exists(),
             'is_followed':UserFollowedQuestion.objects.filter(user=user, question=question).exists(),
             'answers': answer_data
