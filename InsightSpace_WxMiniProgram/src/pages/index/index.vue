@@ -60,8 +60,9 @@ const addview = async () => {
     <div v-for="question in questions" :key="question.q_id" @click="viewInfo(question.q_id)">
       <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
         <text class="limit-lines">{{ question.content }}</text>
-        <uni-icons class="eyes" type="eye" size="17"><text class="viewnum">120</text></uni-icons>
-        <uni-icons class="chats" type="chat" size="17"><text class="viewnum">9</text></uni-icons>
+        <uni-icons class="eyes" type="eye" size="17"><text class="viewnum">{{ question.views }}</text></uni-icons>
+        <uni-icons class="chats" type="chat" size="17"><text class="viewnum">{{ question.answers.length
+            }}</text></uni-icons>
       </uni-card>
     </div>
   </view>

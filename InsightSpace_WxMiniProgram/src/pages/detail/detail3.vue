@@ -69,7 +69,7 @@
         <view class="like-dislike">
           <icon>
             <image class="likeA-icon" :src="likeIconSrcA"
-              @tap="toggleLikeA(answer.a_id, answer.is_liked, answer.username)">
+              @tap="toggleLikeA(answer.a_id, answer.is_liked, answer.username, index)">
             </image>
             <image v-if="answer.username !== name" class="reportA-icon" src="/static/images/report1.png"
               @tap="toggleReportA(answer.a_id)">
@@ -218,26 +218,53 @@ const toggleLikeQ = () => {
     : '/static/images/like.png'
   console.log('2', likeIconSrc.value)
 }
-const flag = ref(true)
-const toggleLikeA = (id, is_liked, name) => {
+const flag = ref(false)
+const toggleLikeA = (id, is_liked, name, index) => {
   console.log('处理回答id的点赞功能:', id)
   if (flag.value) {
     if (is_liked) {
       //取消点赞
       unlikeA(id, name)
-      question.value.answers[id].is_liked = false
+      question.value.answers[index].is_liked = false
+      console.log(
+        'answers数组第',
+        index,
+        '个元素的is_liked属性变为:',
+        question.value.answers[index].is_liked,
+      )
     } else {
       //点赞
       likeA(id, name)
+      question.value.answers[index].is_liked = true
+      console.log(
+        'answers数组第',
+        index,
+        '个元素的is_liked属性变为:',
+        question.value.answers[index].is_liked,
+      )
     }
     flag.value = false
   } else {
     if (is_liked) {
       //点赞
       likeA(id, name)
+      question.value.answers[index].is_liked = true
+      console.log(
+        'answers数组第',
+        index,
+        '个元素的is_liked属性变为:',
+        question.value.answers[index].is_liked,
+      )
     } else {
       //取消点赞
       unlikeA(id, name)
+      question.value.answers[index].is_liked = false
+      console.log(
+        'answers数组第',
+        index,
+        '个元素的is_liked属性变为:',
+        question.value.answers[index].is_liked,
+      )
     }
     flag.value = true
   }
