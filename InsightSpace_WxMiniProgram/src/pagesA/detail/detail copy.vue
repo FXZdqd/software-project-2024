@@ -16,51 +16,40 @@
 
     <!--标签-->
     <view class="row">
-      <!--view class="col"-->
-      <uni-tag class="tag" :inverted="true" :text="tagname(tag)" :type="getTagType(tag)"
-        v-for="(tag, index) in question.tags" :key="index" size="mini" />
+      <view class="col" v-for="(tag, index) in question.tags" :key="index">
+        <uni-tag class="tag" :inverted="true" :text="tagname(tag)" :type="getTagType(tag)" />
+      </view>
     </view>
 
     <b></b>
     <!-- 问题内容 -->
     <view class="qcontent">
       <text>{{ question.content }}</text>
-      <view>
-        <icon>
-          <image v-if="question.username !== name" class="report-icon" src="/static/images/report1.png"
-            @tap="toggleReportQ">
-          </image>
-          <image v-else class="report-icon" src="/static/images/delete.png" @tap="toggleDeleteQ">
-          </image>
-          <image class="like-icon" :src="likeIconSrc" @tap="toggleLikeQ"></image>
-          <image class="follow-icon" :src="followIconSrc" @tap="togglefollow"></image>
-        </icon>
-      </view>
-      <view class="questiondata">
-        <text>{{ question.views }}次浏览 |
-          {{
-            question.answers.length
-          }}个回答&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&nbsp;{{
-            question.likes
-          }}</text>
-      </view>
+      <icon>
+        <image v-if="question.username !== name" class="report-icon" src="/static/images/report1.png"
+          @tap="toggleReportQ">
+        </image>
+        <image v-else class="report-icon" src="/static/images/delete.png" @tap="toggleDeleteQ">
+        </image>
+        <image class="like-icon" :src="likeIconSrc" @tap="toggleLikeQ"></image>
+        <image class="follow-icon" :src="followIconSrc" @tap="togglefollow"></image>
+      </icon>
     </view>
 
     <b></b>
     <view>
-      <button class="button" type="default" style="color: #20afd2; bordercolor: #20afd2" plain="true"
-        @click="handleAnswer">
-        <text>去回答</text>
+      <button class="button" type="primary" plain="true" @click="handleAnswer">
+        <text class="button-text">去回答</text>
       </button>
     </view>
     <view>
       <!-- 普通弹窗 -->
       <uni-popup class="pop" ref="popup" background-color="#fff" type="bottom">
-        <view class="popup-content"><text class="text"></text>
+        <view class="popup-content"><text class="text">我的回答</text>
           <uni-forms-item>
             <uni-easyinput type="textarea" v-model="myanswer" placeholder="请输入您的回答" />
           </uni-forms-item>
-          <button class="fabu" type="main" plain="true" @click="handlegoAnswer">发布</button>
+          <button type="primary" plain="true" @click="handlegoAnswer">发布</button>
         </view>
       </uni-popup>
     </view>
@@ -79,8 +68,8 @@
         <!-- 点赞和踩按钮 -->
         <view class="like-dislike">
           <icon>
-            <image class="likeA-icon" :src="answer.is_liked ? '/static/images/liked.png' : '/static/images/like.png'"
-              @tap="toggleLikeA(answer.a_id, answer.is_liked, answer.username, index)">
+            <image class="likeA-icon" :src="likeIconSrcA"
+              @tap="toggleLikeA(answer.a_id, answer.is_liked, answer.username)">
             </image>
             <image v-if="answer.username !== name" class="reportA-icon" src="/static/images/report1.png"
               @tap="toggleReportA(answer.a_id)">
@@ -88,9 +77,6 @@
             <image v-else class="reportA-icon" src="/static/images/delete.png" @tap="toggleDeleteA(answer.a_id)">
             </image>
           </icon>
-        </view>
-        <view class="likenum">
-          <text>{{ answer.likes }}</text>
         </view>
       </view>
     </view>
@@ -136,19 +122,8 @@ const handleAnswer = () => {
   popup.value.open()
 }
 const handlegoAnswer = () => {
-  uni.showModal({
-    title: '提示',
-    content: '确定要发布吗？',
-    success: function (res) {
-      if (res.confirm) {
-        console.log('用户点击确定')
-        goAnswer()
-        popup.value.close()
-      } else if (res.cancel) {
-        console.log('用户点击取消')
-      }
-    },
-  })
+  goAnswer()
+  popup.value.close()
 }
 const myanswer = ref('')
 const UserStore = useUserStore()
@@ -159,7 +134,6 @@ const goAnswer = async () => {
     username: UserStore.profile.username,
   })
   console.log(res)
-  getDetails()
 }
 
 const getTagType = (tag) => {
@@ -202,8 +176,6 @@ const getDetails = async () => {
   question.value.is_followed = res.is_followed
   question.value.tags = res.tags
   name.value = UserStore.profile.username
-  question.value.likes = res.likes
-  question.value.views = res.views
   console.log(question.value)
 
   if (question.value.is_liked) {
@@ -223,59 +195,54 @@ const getDetails = async () => {
 }
 getDetails()
 const likeIconSrc = ref('/static/images/like.png')
+const likeIconSrcA = ref('/static/images/like.png')
 const followIconSrc = ref('/static/images/follow.png')
 const reportIconSrc = ref('/static/images/report1.png')
 const toggleSee = (name) => {
   uni.setStorageSync('otherUsername', name)
   uni.navigateTo({ url: '/pagesMember/otherProfile/otherProfile' })
 }
-const toggleLikeQ = async () => {
+const toggleLikeQ = () => {
   console.log('1', question.value.is_liked)
   if (question.value.is_liked) {
     //取消点赞
     unlikeQ()
     question.value.is_liked = false
-    question.value.likes = question.value.likes - 1
   } else {
     //点赞
     likeQ()
     question.value.is_liked = true
-    question.value.likes = question.value.likes + 1
   }
   likeIconSrc.value = question.value.is_liked
     ? '/static/images/liked.png'
     : '/static/images/like.png'
   console.log('2', likeIconSrc.value)
 }
-
-const toggleLikeA = (id, is_liked, name, index) => {
-  if (is_liked) {
-    //取消点赞
-    console.log('处理回答id的取消点赞功能:', id)
-    unlikeA(id, name)
-    question.value.answers[index].is_liked = false
-    question.value.answers[index].likes = question.value.answers[index].likes - 1
-    console.log(
-      'answers数组第',
-      index,
-      '个元素的is_liked属性变为:',
-      question.value.answers[index].is_liked,
-    )
+const flag = ref(true)
+const toggleLikeA = (id, is_liked, name) => {
+  console.log('处理回答id的点赞功能:', id)
+  if (flag.value) {
+    if (is_liked) {
+      //取消点赞
+      unlikeA(id, name)
+      question.value.answers[id].is_liked = false
+    } else {
+      //点赞
+      likeA(id, name)
+    }
+    flag.value = false
   } else {
-    //点赞
-    console.log('处理回答id的点赞功能1:', id)
-    likeA(id, name)
-    question.value.answers[index].is_liked = true
-    question.value.answers[index].likes = question.value.answers[index].likes + 1
-    console.log(
-      'answers数组第',
-      index,
-      '个元素的is_liked属性变为:',
-      question.value.answers[index].is_liked,
-    )
+    if (is_liked) {
+      //点赞
+      likeA(id, name)
+    } else {
+      //取消点赞
+      unlikeA(id, name)
+    }
+    flag.value = true
   }
 }
-const togglefollow = async () => {
+const togglefollow = () => {
   console.log(question.value.is_followed)
   if (question.value.is_followed) {
     console.log('取消关注')
@@ -310,11 +277,11 @@ const unlikeQ = async () => {
 }
 
 const likeA = async (id, username) => {
-  const res = await likeAAPI({ a_id: id, username: UserStore.profile.username })
+  const res = await likeAAPI({ a_id: id, username: username })
   console.log(res)
 }
 const unlikeA = async (id, username) => {
-  const res = await unlikeAAPI({ a_id: id, username: UserStore.profile.username })
+  const res = await unlikeAAPI({ a_id: id, username: username })
   console.log(res)
 }
 const followQ = async () => {
@@ -333,7 +300,7 @@ const reportA = async (id) => {
   const res = await reportAAPI({ a_id: id })
   console.log(res)
 }
-const toggleDeleteA = async (id) => {
+const toggleDeleteA = (id) => {
   uni.showModal({
     title: '删除',
     content: '确定要删除吗？',
@@ -341,14 +308,13 @@ const toggleDeleteA = async (id) => {
       if (res.confirm) {
         console.log('用户点击确定')
         delA(id)
-        getDetails()
       } else if (res.cancel) {
         console.log('用户点击取消')
       }
     },
   })
 }
-const toggleDeleteQ = async () => {
+const toggleDeleteQ = () => {
   uni.showModal({
     title: '删除',
     content: '确定要删除吗？',
@@ -356,17 +322,13 @@ const toggleDeleteQ = async () => {
       if (res.confirm) {
         console.log('用户点击确定')
         delQ()
-        uni.switchTab({ url: '/pages/index/index' })
-        uni.showToast({
-          title: '删除成功',
-        })
       } else if (res.cancel) {
         console.log('用户点击取消')
       }
     },
   })
 }
-const toggleReportQ = async () => {
+const toggleReportQ = () => {
   //弹出一个dialog
   uni.showModal({
     title: '举报',
@@ -487,21 +449,21 @@ function formatDate(dateString) {
 .likeA-icon {
   width: 25px;
   height: 25px;
-  margin-left: 280px;
+  margin-left: 260px;
 }
 
 .reportA-icon {
   width: 25px;
   height: 25px;
-  margin-right: 5px;
-  margin-left: 15px;
+  margin-right: 10px;
+  margin-left: 13px;
 }
 
 .report-icon {
   width: 25px;
   height: 25px;
   margin-right: 10px;
-  margin-left: 240px;
+  margin-left: 200px;
 }
 
 .icon {
@@ -526,16 +488,13 @@ function formatDate(dateString) {
   font-size: 21px;
   margin-left: 5%;
   position: relative;
-  width: 340px;
-  word-wrap: break-word;
-  word-break: normal;
 }
 
 .qcontent {
   font-size: 16px;
   margin-left: 5%;
-  margin-right: 4%;
   position: relative;
+  right: 10px;
 }
 
 .qdate {
@@ -544,15 +503,13 @@ function formatDate(dateString) {
 }
 
 .tag {
-  /* width: 30px;
-  height: 4px; */
-  margin-right: 3px;
-  margin-left: 3px;
+  width: 30px;
+  height: 7px;
 }
 
 .row {
-  /* display: flex; */
-  /* width: 35%; */
+  display: flex;
+  width: 35%;
   margin-top: 5px;
   margin-bottom: 10px;
   margin-left: 5px;
@@ -560,37 +517,5 @@ function formatDate(dateString) {
 
 .col {
   flex: 1;
-}
-
-.likenum {
-  font-size: 12px;
-  color: rgb(142, 142, 144);
-  margin-left: 288px;
-}
-
-.likeQnum {
-  font-size: 12px;
-  color: rgb(142, 142, 144);
-}
-
-.questiondata {
-  font-size: 12px;
-  color: rgb(142, 142, 144);
-  margin-left: 2px;
-  margin-bottom: 5px;
-}
-
-.button {
-  width: 370px;
-  height: 40px;
-  font-size: 16px;
-  align-items: center;
-  justify-content: center;
-}
-
-.fabu {
-  width: 200px;
-  height: 30px;
-  font-size: 12px;
 }
 </style>

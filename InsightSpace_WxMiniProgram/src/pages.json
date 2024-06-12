@@ -104,6 +104,12 @@
           "style": {
             "navigationBarTitleText": "个人信息"
           }
+        },
+        {
+          "path": "introduction/introduction",
+          "style": {
+            "navigationBarTitleText": "关于《灵询》"
+          }
         }
       ]
     },

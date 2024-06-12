@@ -34,7 +34,7 @@ const cancel = async () => {
           editable: true,
           success: async (res1) => {
             if (res1.content == userStore.profile.password) {
-              const res2 = await deleteUserAPI({username: userStore.profile.username})
+              const res2 = await deleteUserAPI({ username: userStore.profile.username })
               console.log(res2.message);
               // 清理用户信息
               userStore.clearProfile()
@@ -75,7 +75,7 @@ const cancel = async () => {
     </view>
     <!-- 列表3 -->
     <view class="list">
-      <navigator hover-class="none" class="item arrow" url=" ">关于《灵询》</navigator>
+      <navigator hover-class="none" class="item arrow" url="/pagesMember/introduction/introduction">关于《灵询》</navigator>
     </view>
     <!-- 操作按钮 -->
     <view class="action">
