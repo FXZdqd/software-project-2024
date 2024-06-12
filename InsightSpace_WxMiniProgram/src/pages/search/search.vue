@@ -1,19 +1,32 @@
 //新建一个空白的搜索页面
 <template>
   <view class="uni-padding-wrap uni-common-mt">
-    <uni-segmented-control :current="current" :values="items" style-type="text" @clickItem="onClickItem" />
+    <uni-segmented-control
+      :current="current"
+      :values="items"
+      style-type="text"
+      @clickItem="onClickItem"
+    />
   </view>
   <view v-if="current === 0" class="index">
     <div v-for="question in questions" :key="question.q_id" @click="viewInfo(question.q_id)">
-      <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
-        <text>{{ question.content }}</text>
+      <uni-card
+        :title="question.title"
+        :sub-title="question.username"
+        :extra="formatDate(question.date)"
+      >
+        <text class="limit-lines">{{ question.content }}</text>
       </uni-card>
     </div>
   </view>
   <view v-if="current === 1" class="index">
     <div v-for="user in users" :key="user.username" @click="viewUser(user.username)">
       <uni-card>
-        <img v-if="user.base64 !== null" class="avatar" :src="'data:image/jpeg;base64,' + user.base64" />
+        <img
+          v-if="user.base64 !== null"
+          class="avatar"
+          :src="'data:image/jpeg;base64,' + user.base64"
+        />
         <img v-else class="avatar" src="@/static/images/avatar1.png" />
         <text class="username">{{ user.username }}</text>
       </uni-card>
@@ -148,5 +161,12 @@ const viewUser = (name) => {
 
 .username {
   margin-left: 20px;
+}
+
+.limit-lines {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
 }
 </style>

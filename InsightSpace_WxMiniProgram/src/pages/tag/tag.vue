@@ -2,7 +2,7 @@
     <view class="index">
         <div v-for="question in questions" :key="question.q_id" @click="viewInfo(question.q_id)">
             <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
-                <text>{{ question.content }}</text>
+                <text class="limit-lines">{{ question.content }}</text>
             </uni-card>
         </div>
     </view>
@@ -62,6 +62,11 @@ const viewInfo = (index) => {
 }
 </script>
 
-<style lang>
-
+<style>
+.limit-lines {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+}
 </style>
