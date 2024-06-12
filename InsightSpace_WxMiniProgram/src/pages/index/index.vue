@@ -38,7 +38,7 @@ const viewInfo = (index: any) => {
   uni.setStorageSync('q_id', index)
   viewid.value = index
   addview()
-  uni.navigateTo({ url: '/pages/detail/detail' })
+  uni.navigateTo({ url: '/pagesA/detail/detail' })
 }
 
 const addview = async () => {

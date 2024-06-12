@@ -8,7 +8,7 @@ const confirm = (value: any) => {
   let valstr = value.value
   console.log(valstr)
   uni.setStorageSync('valstr', valstr)
-  uni.navigateTo({ url: '/pages/search/search' })
+  uni.navigateTo({ url: '/pagesA/search/search' })
   //searchkeyword(valstr)
 }
 
@@ -21,7 +21,7 @@ const range = ref([
   { value: 4, text: "按相关度" },
 ])
 
-const change = (e:any) => {
+const change = (e: any) => {
   console.log("e:", e);
   uni.setStorageSync('sort', e)
 }

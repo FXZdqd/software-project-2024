@@ -23,7 +23,7 @@ const SeeTag = (name: string) => {
   }
   uni.setStorageSync('tag_name', name)
   uni.navigateTo({
-    url: `/pages/tag/tag`,
+    url: `/pagesA/tag/tag`,
   })
 }
 </script>

@@ -2,6 +2,7 @@
 import {
   getAvatarAPI, resetPasswordAPI, setAvatarAPI,
   reUsernameAPI, getUserAPI, setUserInfoAPI,
+  getQuestionAskedByUserAPI,
 } from '@/services/user'
 import type { ProfileDetail } from '@/types/user'
 import { onLoad } from '@dcloudio/uni-app'
@@ -21,14 +22,11 @@ const getAvatar = async () => {
   if (data.value == 0) {
     isphoto.value = true
     photo.value = 'http://39.109.126.173:39001/api' + data.url;
-
   } else {
     console.log('获取头像失败');
   }
 }
 getAvatar();
-
-
 
 let filePath = ''
 const setAvatar = async () => {
@@ -64,34 +62,6 @@ const setAvatar = async () => {
     console.error('图片选择失败', error);
   }
 }
-/* const setAvatar = () =>{
-  uni.chooseMedia({
-    count: 1,
-    mediaType: ['image'],
-    success: (res) => {
-      const { tempFilePath } = res.tempFiles[0]
-      uni.uploadFile({
-        url: 'http://39.109.126.173:39001/api/setAvatar', 
-        name: 'photo',
-        filePath: tempFilePath,
-        success: (res) => {
-          // 判断状态码是否上传成功
-          if (res.statusCode === 200) {
-            // 提取头像
-            const { avatar } = JSON.parse(res.data).result
-            getAvatar
-            uni.showToast({ icon: 'success', title: '更新成功' })
-          } else {
-            uni.showToast({ icon: 'error', title: '出现错误' })
-          }
-        },
-        fail: (err) => {
-            console.error('上传失败:', err);
-          }
-      })
-    },
-  })
-} */
 
 
 const isProfile = ref(true)
@@ -120,6 +90,7 @@ getUserProfileData()
 onLoad(() => {
   getUserProfileData()
   getAvatar()
+
 })
 onMounted(
   getUserProfileData

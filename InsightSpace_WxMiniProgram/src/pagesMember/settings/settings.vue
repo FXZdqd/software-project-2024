@@ -61,11 +61,12 @@ const cancel = async () => {
 <template>
   <view class="viewport">
     <!-- 列表1 -->
-    <view class="list" v-if="true">
+    <view class="list">
       <navigator url="/pagesMember/myProfile/myProfile" hover-class="none" class="item arrow">
         我的信息
       </navigator>
     </view>
+
     <!-- 列表2 -->
     <view class="list">
       <button hover-class="none" class="item arrow" open-type="openSetting">授权管理</button>

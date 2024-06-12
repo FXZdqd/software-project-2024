@@ -111,7 +111,7 @@ const viewInfo = (index: any) => {
   // 将 q_id 存储在本地存储中
   uni.setStorageSync('q_id', index)
   // 跳转详情页
-  uni.navigateTo({ url: '/pages/detail/detail' })
+  uni.navigateTo({ url: '/pagesA/detail/detail' })
 }
 function formatDate(dateString: any) {
   const options = {
@@ -135,10 +135,8 @@ const getAvatar = async () => {
 getAvatar()
 
 onShow(async () => {
-  getFollowQ
-  getAvatar
-  getQuestionAskedByUser
-  getQuestionAnsweredByUser
+  getQuestionAskedByUser()
+  getAvatar()
   console.log('onshow被调用了')
 })
 </script>
@@ -152,7 +150,7 @@ onShow(async () => {
         <image class="avatar" mode="aspectFill" :src="isphoto ? photo : '../../../static/images/avatar1.png'"></image>
         <view class="meta">
           <view class="nickname">{{ otherUsername }}</view>
-          <view class="grade">{{ profile.grade }}级</view>
+          <view class="grade" v-if="profile.grade">{{ profile.grade }}级</view>
           <view class="department">{{ profile.department }}</view>
         </view>
       </view>

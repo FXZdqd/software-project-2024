@@ -85,7 +85,7 @@ const viewInfo = (index: any) => {
   // 将 q_id 存储在本地存储中
   uni.setStorageSync('q_id', index);
   // 跳转详情页
-  uni.navigateTo({ url: '/pages/detail/detail' });
+  uni.navigateTo({ url: '/pagesA/detail/detail' });
 }
 function formatDate(dateString: any) {
   const options = {
@@ -108,12 +108,13 @@ const getAvatar = async () => {
     console.log('用户未设置头像');
   }
 }
-getAvatar();
 
 onShow(async () => {
-  getAvatar
-  getQuestionAskedByUser
+  getAvatar()
+  getQuestionAskedByUser()
   console.log('onshow被调用了');
+  console.log('current=', current.value);
+
 })
 </script>
 
@@ -154,7 +155,7 @@ onShow(async () => {
       <view class="container">
         <scroll-view class="scroll-view-container" :scroll-y="true" :scroll-top="scrollTop">
           <view class="content">
-            <view v-if="current === 0"><!-- 我的提问 -->
+            <view v-if="current == 0"><!-- 我的提问 -->
               <view class="content-text">
                 <div v-for="question in AskQ" :key="question.q_id" @click="viewInfo(question.q_id)">
                   <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
@@ -163,7 +164,7 @@ onShow(async () => {
                 </div>
               </view>
             </view>
-            <view v-if="current === 1"><!-- 我的回答 -->
+            <view v-if="current == 1"><!-- 我的回答 -->
               <view class="content-text">
                 <div v-for="question in AnsQ" :key="question.q_id" @click="viewInfo(question.q_id)">
                   <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
@@ -172,7 +173,7 @@ onShow(async () => {
                 </div>
               </view>
             </view>
-            <view v-if="current === 2"><!-- 我的关注 -->
+            <view v-if="current == 2"><!-- 我的关注 -->
               <view class="content-text">
                 <div v-for="question in FollowQ" :key="question.q_id" @click="viewInfo(question.q_id)">
                   <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
@@ -215,19 +216,19 @@ page {
 }
 
 .uni-common-mt {
-  margin-top: 0px;
-  padding-top: 0px;
+  margin-top: 0rpx;
+  padding-top: 0rpx;
   background-color: #ffffff;
 }
 
 .uni-padding-wrap {
   // width: 750rpx;
-  padding: 0px 0px;
+  padding: 0rpx 0rpx;
 }
 
 .scroll-view-container {
-  height: 450px;
-  border: 1px solid #ccc;
+  height: 1000rpx;
+  border: 1rpx solid #ccc;
   overflow-y: auto;
 }
 
@@ -304,7 +305,7 @@ page {
 
 .uni-divider {
   width: 100%;
-  height: 7px;
+  height: 7rpx;
   background-color: #d6d6d6;
   //margin: 10px 0;  
   //margin-top: px;
@@ -319,26 +320,31 @@ page {
 
 .down {
   opacity: 0.8;
-  height: 1000px;
+  //height: 1000px;
   background-color: #ffffff;
 }
 
 .content {
   opacity: 1;
   //margin-top: 30rpx;
-
+  //overflow: hidden;
   justify-content: center;
   align-items: center;
   height: 100%;
   //overflow-y: stroll;
 }
 
+.content-text {
+  height: 100%;
+}
+
 .bottom {
   text-align: center;
-  margin-top: 5px;
-  margin-bottom: 25px;
+  margin-top: 5rpx;
+  margin-bottom: 25rpx;
   color: #b7b7b7
 }
+
 
 .limit-lines {
   display: -webkit-box;

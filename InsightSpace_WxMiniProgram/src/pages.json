@@ -1,139 +1,153 @@
 {
-	"easycom": {
-		"autoscan": true,
-		"custom": {
-			// uni-ui 规则如下配置
-			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
-		}
-	},
-	"pages": [
-		//pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
-		{
-			"path": "pages/login/login",
-			"style": {
-				"navigationBarTitleText": "登录"
-			}
-		},
-		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationStyle": "custom", // 隐藏默认导航
-				"navigationBarTextStyle": "black",
-				"navigationBarTitleText": "灵询问答 · 智慧领航",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			//详情页
-			"path": "pages/detail/detail",
-			"style": {
-				"navigationBarTitleText": "详情",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			//tag页
-			"path": "pages/tag/tag",
-			"style": {
-				"navigationBarTitleText": "分类内容"
-			}
-		},
-		{
-			//搜索页
-			"path": "pages/search/search",
-			"style": {
-				"navigationBarTitleText": "搜索"
-			}
-		},
-		{
-			"path": "pages/my/my",
-			"style": {
-				"navigationStyle": "custom",
-				"navigationBarTitleText": "我的"
-			}
-		},
-		{
-			"path": "pages/question/question",
-			"style": {
-				"navigationBarTitleText": "提问"
-			}
-		},
-		{
-			"path": "pages/dialogue/dialogue",
-			"style": {
-				"navigationBarTitleText": "AI问答"
-			}
-		}
-	],
-	"globalStyle": {
-		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "",
-		"navigationBarBackgroundColor": "#9bcdff",
-		"backgroundColor": "#F8F8F8"
-	},
-	// 设置 TabBar
-	"tabBar": {
-		"selectedColor": "#55aaff",
-		"list": [
-			{
-				"pagePath": "pages/index/index",
-				"text": "首页",
-				"iconPath": "static/images/首页.png",
-				"selectedIconPath": "static/images/首页.png"
-			},
-			{
-				"pagePath": "pages/question/question",
-				"text": "提问",
-				"iconPath": "static/images/添加.png",
-				"selectedIconPath": "static/images/添加.png"
-			},
-			{
-				"pagePath": "pages/dialogue/dialogue",
-				"text": "AI",
-				"iconPath": "static/images/客服.png",
-				"selectedIconPath": "static/images/客服.png"
-			},
-			{
-				"pagePath": "pages/my/my",
-				"text": "我的",
-				"iconPath": "static/images/我的.png",
-				"selectedIconPath": "static/images/我的.png"
-			}
-		]
-	},
-	"subPackages": [
-		{
-			"root": "pagesMember",
-			"pages": [
-				{
-					"path": "settings/settings",
-					"style": {
-						"navigationBarTitleText": "设置"
-					}
-				},
-				{
-					"path": "myProfile/myProfile",
-					"style": {
-						"navigationStyle": "custom",
-						"navigationBarTitleText": "我的信息"
-					}
-				},
-				{
-					"path": "otherProfile/otherProfile",
-					"style": {
-            //"navigationStyle": "custom",
-						"navigationBarTitleText": "个人信息"
-					}
-				}
-			]
-		}
-	],
-	"preloadRule": {
-		"pages/my/my": {
-			"network": "all",
-			"packages": [
-				"pagesMember"
-			]
-		}
-	}
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      // uni-ui 规则如下配置
+      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+    }
+  },
+  "pages": [
+    //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarTitleText": "登录"
+      }
+    },
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationStyle": "custom", // 隐藏默认导航
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "灵询问答 · 智慧领航",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/my/my",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "我的"
+      }
+    },
+    {
+      "path": "pages/question/question",
+      "style": {
+        "navigationBarTitleText": "提问"
+      }
+    },
+    {
+      "path": "pages/dialogue/dialogue",
+      "style": {
+        "navigationBarTitleText": "AI问答"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "",
+    "navigationBarBackgroundColor": "#9bcdff",
+    "backgroundColor": "#F8F8F8"
+  },
+  "window": {
+    "navigationBarTitleText": "WeChat"
+  }
+  // 设置 TabBar
+  "tabBar": {
+    "selectedColor": "#55aaff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "static/images/首页.png",
+        "selectedIconPath": "static/images/首页.png"
+      },
+      {
+        "pagePath": "pages/question/question",
+        "text": "提问",
+        "iconPath": "static/images/添加.png",
+        "selectedIconPath": "static/images/添加.png"
+      },
+      {
+        "pagePath": "pages/dialogue/dialogue",
+        "text": "AI",
+        "iconPath": "static/images/客服.png",
+        "selectedIconPath": "static/images/客服.png"
+      },
+      {
+        "pagePath": "pages/my/my",
+        "text": "我的",
+        "iconPath": "static/images/我的.png",
+        "selectedIconPath": "static/images/我的.png"
+      }
+    ]
+  },
+  "subPackages": [
+    {
+      "root": "pagesMember",
+      "pages": [
+        {
+          "path": "settings/settings",
+          "style": {
+            "navigationBarTitleText": "设置"
+          }
+        },
+        {
+          "path": "myProfile/myProfile",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "我的信息"
+          }
+        },
+        {
+          "path": "otherProfile/otherProfile",
+          "style": {
+            "navigationBarTitleText": "个人信息"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pagesA",
+      "pages": [
+        {
+          //详情页
+          "path": "detail/detail",
+          "style": {
+            "navigationBarTitleText": "详情",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          //tag页
+          "path": "tag/tag",
+          "style": {
+            "navigationBarTitleText": "分类内容"
+          }
+        },
+        {
+          //搜索页
+          "path": "search/search",
+          "style": {
+            "navigationBarTitleText": "搜索"
+          }
+        }
+      ]
+    }
+  ],
+  "preloadRule": {
+    "pages/my/my": {
+      "network": "all",
+      "packages": [
+        "pagesMember",
+        "pagesA"
+      ]
+    },
+    "pages/index/index": {
+      "network": "all",
+      "packages": [
+        "pagesA"
+      ]
+    }
+  }
 }
