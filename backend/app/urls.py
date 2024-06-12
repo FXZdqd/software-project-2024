@@ -31,7 +31,6 @@ urlpatterns = [
     path('chaQuestion', question.ChangeQuestion.as_view()),
     path('likeQuestion', question.LikeQuestion.as_view()),
     path('unlikeQuestion', question.UnlikeQuestion.as_view()),
-    path('checkUserlikeQuestion', question.CheckUserLikeQuestion.as_view()),
     path('getQuestion', question.GetQuestion.as_view()),
     path('viewQuestion', question.ViewQuestion.as_view()),
     path('reportQuestion', question.ReportQuestion.as_view()),
@@ -40,7 +39,6 @@ urlpatterns = [
     path('goAnswer', answer.CreateAnswer.as_view()),
     path('likeAnswer', answer.LikeAnswer.as_view()),
     path('unlikeAnswer', answer.UnlikeAnswer.as_view()),
-    path('checkUserlikeAnswer', answer.CheckUserLikeAnswer.as_view()),
     path('reportAnswer', answer.ReportAnswer.as_view()),
     path('delAnswer', answer.DelAnswer.as_view()),
     # 关注功能

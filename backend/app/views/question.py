@@ -1,4 +1,4 @@
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from rest_framework.views import APIView, Request
 from rest_framework.response import Response
 from rest_framework import status
@@ -77,7 +77,7 @@ class DeleteQuestion(APIView):
 class GetAllQuestions(APIView):
     def post(self, req: Request):
         return_data = []
-        all_questions = Question.objects.prefetch_related('answers').all()  # Prefetch answers to reduce database hits
+        all_questions = Question.objects.prefetch_related('answers').order_by('-views').all()  # Prefetch answers and sort by views in descending order
         for question in all_questions:
             tags = question.tags.all()
             tag_names = [tag.name for tag in tags]
@@ -102,7 +102,6 @@ class GetAllQuestions(APIView):
             })
         return Response(return_data)
 
-
 class GetQuestion(APIView):
     def post(self, req: Request):
         data = req.data
@@ -119,7 +118,8 @@ class GetQuestion(APIView):
             'username': answer.user.username,
             'date': answer.date,
             'likes': answer.likes,
-            'is_liked':UserLikeAnswer.objects.filter(user=user,answer=answer).exists()
+            'is_liked': UserLikeAnswer.objects.filter(user=user, answer=answer).exists(),
+            'url':Avator.objects.filter(user=answer.user).first().file.url
         } for answer in answers]
         return_data = {
             'q_id': question.id,
@@ -131,11 +131,13 @@ class GetQuestion(APIView):
             'likes': question.likes,
             'views': question.views,
             'answer_count': answers.count(),
-            'is_liked':UserLikeQuestion.objects.filter(user=user, question=question).exists(),
-            'is_followed':UserFollowedQuestion.objects.filter(user=user, question=question).exists(),
-            'answers': answer_data
+            'is_liked': UserLikeQuestion.objects.filter(user=user, question=question).exists(),
+            'is_followed': UserFollowedQuestion.objects.filter(user=user, question=question).exists(),
+            'answers': answer_data,
+            'url': Avator.objects.filter(user=question.user).first().file.url
         }
         return Response(return_data)
+
 
 class ViewQuestion(APIView):
     def post(self, req: Request):
@@ -153,6 +155,7 @@ class ViewQuestion(APIView):
             return Response({"error": "Question not found."}, status=status.HTTP_404_NOT_FOUND)
         except IntegrityError:
             return Response({"error": "Could not process like."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class LikeQuestion(APIView):
     def post(self, req: Request):
@@ -213,6 +216,8 @@ class CheckUserLikeQuestion(APIView):
             return Response({"liked": False})
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 class ReportQuestion(APIView):
     def post(self, req: Request):
         q_id = req.data.get('q_id')

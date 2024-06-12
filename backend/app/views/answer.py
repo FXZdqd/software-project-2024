@@ -1,4 +1,4 @@
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from rest_framework.views import APIView, Request
 from rest_framework.response import Response
 from rest_framework import status
@@ -69,9 +69,11 @@ class DelAnswer(APIView):
             if answer is None:
                 return Response({"error": "Answer Not Found"}, status=status.HTTP_404_NOT_FOUND)
             answer.delete()
-            return Response({"message": "Answer delete successfully."}, status=status.HTTP_200_OK)
+            return Response({"message": "Answer deleted successfully."}, status=status.HTTP_200_OK)
+        except Answer.DoesNotExist:
+            return Response({"error": "Answer not found."}, status=status.HTTP_404_NOT_FOUND)
         except IntegrityError:
-            return Response({"error": "Could not process like."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": "Could not process delete."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UnlikeAnswer(APIView):
     def post(self, req: Request):
@@ -91,6 +93,8 @@ class UnlikeAnswer(APIView):
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         except UserLikeAnswer.DoesNotExist:
             return Response({"error": "Like not found."}, status=status.HTTP_404_NOT_FOUND)
+        except IntegrityError:
+            return Response({"error": "Could not process unlike."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class CheckUserLikeAnswer(APIView):
