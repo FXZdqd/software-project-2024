@@ -6,14 +6,14 @@
   <view v-if="current === 0" class="index">
     <div v-for="question in questions" :key="question.q_id" @click="viewInfo(question.q_id)">
       <uni-card :title="question.title" :sub-title="question.username" :extra="formatDate(question.date)">
-        <text>{{ question.content }}</text>
+        <text class="limit-lines">{{ question.content }}</text>
       </uni-card>
     </div>
   </view>
   <view v-if="current === 1" class="index">
     <div v-for="user in users" :key="user.username" @click="viewUser(user.username)">
       <uni-card>
-        <img v-if="user.base64 !== null" class="avatar" :src="'data:image/jpeg;base64,' + user.base64" />
+        <img v-if="user.url !== null" class="avatar" :src="'http://39.109.126.173:39001/api' + user.url" />
         <img v-else class="avatar" src="@/static/images/avatar1.png" />
         <text class="username">{{ user.username }}</text>
       </uni-card>
@@ -74,7 +74,7 @@ const users = ref([
     gender: 'string',
     grade: 'string',
     department: 'string',
-    base64: 'string',
+    url: 'string',
   },
 ])
 const searchkey = async (word, sort) => {
@@ -130,7 +130,7 @@ function formatDate(dateString) {
 }
 const viewInfo = (index) => {
   uni.setStorageSync('q_id', index)
-  uni.navigateTo({ url: '/pagesA/detail/detail' })
+  uni.navigateTo({ url: '/pages/detail/detail' })
 }
 const viewUser = (name) => {
   uni.setStorageSync('otherUsername', name)
@@ -148,5 +148,12 @@ const viewUser = (name) => {
 
 .username {
   margin-left: 20px;
+}
+
+.limit-lines {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
 }
 </style>

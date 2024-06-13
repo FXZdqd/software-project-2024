@@ -37,8 +37,12 @@
         </icon>
       </view>
       <view class="questiondata">
-        <text>10次浏览 |
-          2个回答&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&nbsp;12</text>
+        <text>{{ question.views }}次浏览 |
+          {{
+            question.answers.length
+          }}个回答&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&nbsp;{{
+            question.likes
+          }}</text>
       </view>
     </view>
 
@@ -52,11 +56,11 @@
     <view>
       <!-- 普通弹窗 -->
       <uni-popup class="pop" ref="popup" background-color="#fff" type="bottom">
-        <view class="popup-content"><text class="text">我的回答</text>
-          <uni-forms-item>
+        <view class="popup-content"><text class="text"></text>
+          <uni-forms-item class="input">
             <uni-easyinput type="textarea" v-model="myanswer" placeholder="请输入您的回答" />
           </uni-forms-item>
-          <button type="primary" plain="true" @click="handlegoAnswer">发布</button>
+          <button class="fabu" type="main" plain="true" @click="handlegoAnswer">发布</button>
         </view>
       </uni-popup>
     </view>
@@ -76,7 +80,7 @@
         <view class="like-dislike">
           <icon>
             <image class="likeA-icon" :src="answer.is_liked ? '/static/images/liked.png' : '/static/images/like.png'"
-              @tap="toggleLikeA(answer.a_id, answer.is_liked, answer.username)">
+              @tap="toggleLikeA(answer.a_id, answer.is_liked, index)">
             </image>
             <image v-if="answer.username !== name" class="reportA-icon" src="/static/images/report1.png"
               @tap="toggleReportA(answer.a_id)">
@@ -132,8 +136,19 @@ const handleAnswer = () => {
   popup.value.open()
 }
 const handlegoAnswer = () => {
-  goAnswer()
-  popup.value.close()
+  uni.showModal({
+    title: '提示',
+    content: '确定要发布吗？',
+    success: function (res) {
+      if (res.confirm) {
+        console.log('用户点击确定')
+        goAnswer()
+        popup.value.close()
+      } else if (res.cancel) {
+        console.log('用户点击取消')
+      }
+    },
+  })
 }
 const myanswer = ref('')
 const UserStore = useUserStore()
@@ -187,6 +202,8 @@ const getDetails = async () => {
   question.value.is_followed = res.is_followed
   question.value.tags = res.tags
   name.value = UserStore.profile.username
+  question.value.likes = res.likes
+  question.value.views = res.views
   console.log(question.value)
 
   if (question.value.is_liked) {
@@ -212,7 +229,7 @@ const toggleSee = (name) => {
   uni.setStorageSync('otherUsername', name)
   uni.navigateTo({ url: '/pagesMember/otherProfile/otherProfile' })
 }
-const toggleLikeQ = () => {
+const toggleLikeQ = async () => {
   console.log('1', question.value.is_liked)
   if (question.value.is_liked) {
     //取消点赞
@@ -230,18 +247,35 @@ const toggleLikeQ = () => {
     : '/static/images/like.png'
   console.log('2', likeIconSrc.value)
 }
-const toggleLikeA = (id, is_liked, name) => {
-  console.log('处理回答id的点赞功能:', id)
+
+const toggleLikeA = (id, is_liked, index) => {
   if (is_liked) {
     //取消点赞
-    unlikeA(id, name)
+    console.log('处理回答id的取消点赞功能:', id)
+    unlikeA(id, UserStore.profile.username)
+    question.value.answers[index].is_liked = false
+    question.value.answers[index].likes = question.value.answers[index].likes - 1
+    console.log(
+      'answers数组第',
+      index,
+      '个元素的is_liked属性变为:',
+      question.value.answers[index].is_liked,
+    )
   } else {
     //点赞
-    likeA(id, name)
+    console.log('处理回答id的点赞功能1:', id)
+    likeA(id, UserStore.profile.username)
+    question.value.answers[index].is_liked = true
+    question.value.answers[index].likes = question.value.answers[index].likes + 1
+    console.log(
+      'answers数组第',
+      index,
+      '个元素的is_liked属性变为:',
+      question.value.answers[index].is_liked,
+    )
   }
-  getDetails()
 }
-const togglefollow = () => {
+const togglefollow = async () => {
   console.log(question.value.is_followed)
   if (question.value.is_followed) {
     console.log('取消关注')
@@ -276,11 +310,12 @@ const unlikeQ = async () => {
 }
 
 const likeA = async (id, username) => {
-  const res = await likeAAPI({ a_id: id, username: username })
+  console.log('用户名：', UserStore.profile.username);
+  const res = await likeAAPI({ a_id: id, username: UserStore.profile.username })
   console.log(res)
 }
 const unlikeA = async (id, username) => {
-  const res = await unlikeAAPI({ a_id: id, username: username })
+  const res = await unlikeAAPI({ a_id: id, username: UserStore.profile.username })
   console.log(res)
 }
 const followQ = async () => {
@@ -299,7 +334,7 @@ const reportA = async (id) => {
   const res = await reportAAPI({ a_id: id })
   console.log(res)
 }
-const toggleDeleteA = (id) => {
+const toggleDeleteA = async (id) => {
   uni.showModal({
     title: '删除',
     content: '确定要删除吗？',
@@ -307,13 +342,14 @@ const toggleDeleteA = (id) => {
       if (res.confirm) {
         console.log('用户点击确定')
         delA(id)
+        getDetails()
       } else if (res.cancel) {
         console.log('用户点击取消')
       }
     },
   })
 }
-const toggleDeleteQ = () => {
+const toggleDeleteQ = async () => {
   uni.showModal({
     title: '删除',
     content: '确定要删除吗？',
@@ -321,13 +357,17 @@ const toggleDeleteQ = () => {
       if (res.confirm) {
         console.log('用户点击确定')
         delQ()
+        uni.switchTab({ url: '/pages/index/index' })
+        uni.showToast({
+          title: '删除成功',
+        })
       } else if (res.cancel) {
         console.log('用户点击取消')
       }
     },
   })
 }
-const toggleReportQ = () => {
+const toggleReportQ = async () => {
   //弹出一个dialog
   uni.showModal({
     title: '举报',
@@ -430,7 +470,13 @@ function formatDate(dateString) {
 }
 
 .pop {
-  height: 400px;
+  height: 1000px;
+}
+
+
+
+.input {
+  height: 200px;
 }
 
 .follow-icon {
@@ -547,5 +593,11 @@ function formatDate(dateString) {
   font-size: 16px;
   align-items: center;
   justify-content: center;
+}
+
+.fabu {
+  width: 200px;
+  height: 30px;
+  font-size: 12px;
 }
 </style>

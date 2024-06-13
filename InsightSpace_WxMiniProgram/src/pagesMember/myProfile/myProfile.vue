@@ -22,6 +22,8 @@ const getAvatar = async () => {
   if (data.value == 0) {
     isphoto.value = true
     photo.value = 'http://39.109.126.173:39001/api' + data.url;
+    console.log(photo);
+
   } else {
     console.log('获取头像失败');
   }

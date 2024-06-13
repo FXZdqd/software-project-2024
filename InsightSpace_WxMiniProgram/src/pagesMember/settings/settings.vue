@@ -34,7 +34,7 @@ const cancel = async () => {
           editable: true,
           success: async (res1) => {
             if (res1.content == userStore.profile.password) {
-              const res2 = await deleteUserAPI({ username: userStore.profile.username })
+              const res2 = await deleteUserAPI({ username: userStore.profile.username, password: userStore.profile.password })
               console.log(res2.message);
               // 清理用户信息
               userStore.clearProfile()

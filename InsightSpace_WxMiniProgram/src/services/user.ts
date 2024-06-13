@@ -124,7 +124,7 @@ export const setUserInfoAPI = (data: setUserInfoParams) => {
   })
 }
 
-export const deleteUserAPI = (data: usernameParams) => {
+export const deleteUserAPI = (data: deleteUserParams) => {
   return http({
     method: 'POST',
     url: '/deleteUser',
