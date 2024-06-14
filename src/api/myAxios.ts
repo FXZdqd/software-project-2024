@@ -19,18 +19,18 @@ myAxios.interceptors.response.use(
   (response) => {
     if (response.status === 200) {
       if (response.data["msg"] !== "success") {
-        ElMessage.success(response.data["msg"]);
+        // ElMessage.success(response.data["msg"]);
       }
       return Promise.resolve(response);
     } else {
-      ElMessage.error(response.data["msg"]);
+      // ElMessage.error(response.data["msg"]);
       return Promise.reject(response);
     }
   },
   (error) => {
     const { response } = error;
     if (response) {
-      ElMessage.error(response.data["msg"]);
+      // ElMessage.error(response.data["msg"]);
       return Promise.reject(response);
     } else {
       ElMessage.warning("网络连接异常,请稍后再试");

@@ -2,28 +2,27 @@
   <el-button-group style="padding-bottom: 1%">
     <el-button
       type="danger"
-      :plain="!this.change"
+      :plain="!change"
       @click="
         () => {
-          this.tableData = this.users;
-          this.change = true;
+          tableData = users;
+          change = true;
         }
       "
       >封禁<el-icon><delete></delete></el-icon>
     </el-button>
     <el-button
       type="primary"
-      :plain="this.change"
+      :plain="change"
       @click="
         () => {
-          this.tableData = this.tableData2;
-          this.change = false;
+          tableData = tableData2;
+          change = false;
         }
       "
       >创建<el-icon><CirclePlus></CirclePlus></el-icon></el-button
   ></el-button-group>
   <el-input
-    type="text"
     prefix-icon="Search"
     v-model="searchText"
     placeholder="请输入用户名关键词，按Enter键搜索"
@@ -35,7 +34,7 @@
       left: 40%;
     "
     clearable
-    @clear="handleClear(this.users)"
+    @clear="handleClear(users)"
     @keyup.enter="handleSearch(searchText)"
   ></el-input>
 
@@ -63,25 +62,36 @@
     <el-table-column prop="department" label="学院"></el-table-column>
     <el-table-column prop="grade" label="年级"></el-table-column>
     <el-table-column prop="phone" label="邮箱/手机号"> </el-table-column>
-    <el-table-column prop="username" label="api" v-if="this.change === false">
+    <el-table-column prop="username" label="api" v-if="change === false">
     </el-table-column>
     <!--el-table-column prop="address" label="注册时间"> </el-table-column-->
     <el-table-column prop="reports" label="被举报次数"></el-table-column>
     <el-table-column fixed="right" label="操作">
       <template v-slot="scope">
-        <template v-if="this.change === false">
+        <template v-if="change === false">
           <el-button type="primary"
             >增加<el-icon><CirclePlus></CirclePlus></el-icon>
           </el-button>
         </template>
         <template v-else>
-          <el-button v-if="scope.row.is_banned">已被封禁</el-button>
+          <el-button v-if="scope.row.is_banned" disabled :key="1"
+            >已被封禁</el-button
+          >
           <el-button
-            v-else
+            v-else-if="!scope.row.is_banned"
+            :key="2"
             type="danger"
             @click.stop="banuser(scope.row.username)"
-            >封禁 <el-icon><delete></delete></el-icon> </el-button></template
-      ></template>
+            >封禁 <el-icon style="margin-left: 1px"><delete /></el-icon>
+          </el-button>
+          <!--el-button
+            :type="scope.row.is_banned ? '' : 'danger'"
+            :disabled="scope.row.is_banned"
+            @click.stop="banuser(scope.row.username)"
+            >封禁<el-icon v-if="!scope.row.is_banned"
+              ><delete></delete></el-icon></el-button--></template
+        ></template
+      >
     </el-table-column>
   </el-table>
   <!-- 分页器 -->
@@ -100,101 +110,107 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { getAllUserByReport, banUser, searchUser } from "@/api/request";
+import axios from "axios";
+import { ref, onMounted } from "vue";
+import { ElMessageBox } from "element-plus";
+const users = ref([]);
+const tableData = ref([]);
+const total = ref(0);
+const searchText = ref("");
+const change = ref(true);
+const tableData2 = ref([
+  { username: "为无法通过系统自动认证的新用户创建账号。" },
+]);
+const currentPage = ref(1);
+const pageSize = ref(7);
 
-export default {
-  data() {
-    return {
-      searchText: "",
-      text: "",
-      change: true,
-      tableData: [],
-      users: [],
-      tableData2: [{ username: "为无法通过系统自动认证的新用户创建账号。" }],
-      currentPage: 1, // 当前页码
-      total: 0, // 总条数
-      pageSize: 7, // 每页的数据条数
-    };
-  },
+onMounted(async () => {
+  // console.log(this.text);
+  try {
+    const response = await getAllUserByReport();
+    console.log(response.data.users);
+    if (Array.isArray(response.data.users)) {
+      users.value = response.data.users.map((user) => ({
+        ...user,
+      }));
+      total.value = users.value.length;
+      tableData.value = users.value;
+    } // else {
+    //   ElNotification({
+    //     title: "错误",
+    //     message: "获取问题列表失败",
+    //     type: "error",
+    //   });
+    //   this.users = [];
+    // }
+  } catch (error) {
+    console.error("There was an error fetching the users:", error);
+    //}
+  }
+});
+//每页条数改变时触发 选择一页显示多少行
+function handleSizeChange(val) {
+  console.log(`每页 ${val} 条`);
+  currentPage.value = 1;
+  pageSize.value = val;
+}
+//当前页改变时触发 跳转其他页
+function handleCurrentChange(val) {
+  console.log(`当前页: ${val}`);
+  currentPage.value = val;
+}
+const handleSearch = async (searchText) => {
+  // searchText.value = val;functionsearchText
+  //alert("搜索内容：", searchText.value); /?
 
-  async mounted() {
-    // console.log(this.text);
-    try {
-      const response = await getAllUserByReport();
-      console.log(response.data.users);
-      if (Array.isArray(response.data.users)) {
-        this.users = response.data.users.map((user) => ({
-          ...user,
-        }));
-        this.total = this.users.length;
-        this.tableData = this.users;
-      } // else {
-      //   ElNotification({
-      //     title: "错误",
-      //     message: "获取问题列表失败",
-      //     type: "error",
-      //   });
-      //   this.users = [];
-      // }
-    } catch (error) {
-      console.error("There was an error fetching the users:", error);
-      //}
+  // console.log(response.data); // var text = document.getElementById("searchText").value;
+  // searchText.addEventListener("keyup", (event) => {
+  //   console.log(event.keyCode);
+  // });
+  console.log("执行查询操作，关键字：", searchText);
+  try {
+    // this.search(searchText).then((result) => (res = result));
+    const response = await searchUser(searchText);
+    console.log(response.data);
+
+    if (Array.isArray(response.data.users)) {
+      users.value = response.data.users.map((user) => ({
+        ...user,
+      }));
+      total.value = users.value.length;
+      tableData.value = users.value;
+    } else {
+      tableData.value = [];
     }
-  },
-  methods: {
-    //每页条数改变时触发 选择一页显示多少行
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-      this.currentPage = 1;
-      this.pageSize = val;
-    },
-    //当前页改变时触发 跳转其他页
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-      this.currentPage = val;
-    },
-    handleSearch: async (searchText) => {
-      // searchText.value = val;functionsearchText
-      //alert("搜索内容：", searchText.value); /?
-
-      // console.log(response.data); // var text = document.getElementById("searchText").value;
-      // searchText.addEventListener("keyup", (event) => {
-      //   console.log(event.keyCode);
-      // });
-      console.log("执行查询操作，关键字：", searchText);
-      try {
-        const response = await searchUser(searchText);
-        console.log(response.data);
-        if (Array.isArray(response.data.users)) {
-          users = response.data.users.map((user) => ({
-            ...user,
-          }));
-          total = users.length;
-          tableData = users;
-        } else {
-          tableData.value = [];
-        }
-      } catch (error) {
-        console.error("There was an error searching the users:", error);
-      }
-    },
-    handleClear: async () => {
-      const response = await getAllUserByReport();
-      console.log(response.data.users);
-      if (Array.isArray(response.data.users)) {
-        users = response.data.users.map((user) => ({
-          ...user,
-        }));
-        total = users.length;
-        tableData = users;
-      }
-    },
-    banuser: async (username) => {
+  } catch (error) {
+    console.error("There was an error searching the users:", error);
+  }
+};
+const handleClear = async () => {
+  const response = await getAllUserByReport();
+  console.log(response.data.users);
+  if (Array.isArray(response.data.users)) {
+    users.value = response.data.users.map((user) => ({
+      ...user,
+    }));
+    total.value = users.value.length;
+    tableData.value = users.value;
+  }
+};
+const banuser = async (username) => {
+  ElMessageBox.confirm("确认封禁用户？", "Warning", {
+    confirmButtonText: "封禁",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
+    .then(async () => {
       const response = await banUser(username);
       console.log(response.data);
-    },
-  },
+      this.$forceUpdate();
+    })
+    .catch(() => {});
 };
 </script>
 

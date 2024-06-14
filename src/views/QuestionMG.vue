@@ -27,7 +27,7 @@
       @filter-change="filtchange"
       ><el-table-column type="expand" look="浏览详情">
         <template v-slot="props">
-          <el-form class="demo-table-expand">
+          <el-form class="demo-table-expand" style="margin-right: 15px">
             <el-form-item
               label="问题内容："
               style="padding-left: 20px; font-weight: bolder"
@@ -38,35 +38,40 @@
               ><el-icon><View /></el-icon><span>{{ props.row.views }} </span
               ><el-icon><StarFilled></StarFilled></el-icon
               ><span>{{ props.row.likes }}</span>
-              <el-icon><WarnTriangleFilled /></el-icon
-              ><span>{{ props.row.reports }}</span></el-form-item
-            >
-            <el-icon><Comment></Comment></el-icon>
-            <el-form-item label="回答：" style="padding-left: 20px">
-              <el-form v-for="(val, key) in props.row.answers" :key="key"
+            </el-form-item>
+
+            <el-form-item style="padding-left: 20px">
+              <el-icon><Comment /></el-icon
+              ><el-form
+                v-for="(val, key) in props.row.answers"
+                :key="key"
+                style="margin-left: 8px"
+                ><span>回答{{ key }}:</span
                 ><el-form-item> {{ val.user }}</el-form-item>
-                <el-form-item> {{ formatDate(val.date) }}</el-form-item>
+                <el-form-item size="small">
+                  {{ formatDate(val.date) }}</el-form-item
+                >
                 <el-icon><StarFilled></StarFilled></el-icon
-                ><span>{{ props.row.likes }}</span>
+                ><span>{{ val.likes }}</span>
                 <el-icon><WarnTriangleFilled /></el-icon
-                ><span>{{ props.row.reports }}</span>
+                ><span>{{ val.reports }}</span>
                 <el-form-item> {{ val.content }}</el-form-item></el-form
               >
             </el-form-item>
           </el-form>
         </template>
       </el-table-column>
-      <el-table-column label="问题标题"
+      <el-table-column label="问题标题" width="350px"
         ><template v-slot="scope">{{
           scope.row.title
         }}</template></el-table-column
       >
-      <el-table-column label="时间">
+      <el-table-column label="时间" width="170px">
         <template v-slot="scope">{{
           formatDate(scope.row.date)
         }}</template></el-table-column
       >
-      <el-table-column label="提问者">
+      <el-table-column label="提问者" width="100px">
         <template v-slot="scope">{{
           scope.row.user
         }}</template></el-table-column
@@ -82,6 +87,7 @@
         ]"
         :filter-method="filterTag"
         filter-placement="bottom-end"
+        width="150px"
       >
         <template v-slot="scope">
           <el-tag
@@ -89,10 +95,20 @@
             :key="key"
             :type="tagMap(val)"
             round
+            size="small"
             >{{ val }}</el-tag
           >
         </template>
       </el-table-column>
+      <el-table-column label="" width="110px" align="center"
+        ><template #header=""
+          ><span
+            >被举报次数<el-icon
+              ><WarnTriangleFilled /></el-icon></span></template
+        ><template v-slot="scope"
+          ><span>{{ scope.row.reports }}</span></template
+        ></el-table-column
+      >
       <el-table-column fixed="right" label="操作"
         ><template v-slot="scope">
           <el-button @click.stop="deleteQuestion(scope.row.q_id)" type="danger">
@@ -126,8 +142,8 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
-import { ElButton, ElNotification } from "element-plus";
+// import axios from "axios";
+import { ElButton, ElNotification, ElMessageBox } from "element-plus";
 // import type { ,TagProps  } from "element-plus";
 import {
   getAllQuesByReport,
@@ -186,32 +202,40 @@ function likeQuestion(id) {
   console.log(`Like question ${id}. (Not implemented)`);
 }
 
-const deleteQuestion = async (id) => {
-  try {
-    const response = await delQuestion(id);
-    if (response.data.value === 0) {
-      console.log(`Delete question ${id}. (Not implemented)`);
-      const response = await getAllQuesByReport();
-      if (Array.isArray(response.data.questions)) {
-        questions.value = response.data.questions.map((question) => ({
-          ...question,
-        }));
-        total.value = questions.value.length;
-        // console.log(questions.value.length, total.value)
-      } else {
-        ElNotification({
-          title: "错误",
-          message: "获取问题列表失败",
-          type: "error",
-        });
-        questions.value = [];
+const deleteQuestion = (id) => {
+  ElMessageBox.confirm("确认删除问题？", "Warning", {
+    confirmButtonText: "删除",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
+    .then(async () => {
+      try {
+        const response = await delQuestion(id);
+        if (response.data.value === 0) {
+          console.log(`Delete question ${id}. (Not implemented)`);
+          const response = await getAllQuesByReport();
+          if (Array.isArray(response.data.questions)) {
+            questions.value = response.data.questions.map((question) => ({
+              ...question,
+            }));
+            total.value = questions.value.length;
+            // console.log(questions.value.length, total.value)
+          } else {
+            ElNotification({
+              title: "错误",
+              message: "获取问题列表失败",
+              type: "error",
+            });
+            questions.value = [];
+          }
+        } else {
+          console.log(response.data);
+        }
+      } catch (error) {
+        console.error("There was an error deleting the questions:", error);
       }
-    } else {
-      console.log(response.data);
-    }
-  } catch (error) {
-    console.error("There was an error deleting the questions:", error);
-  }
+    })
+    .catch(() => {});
 };
 function handleSizeChange(val) {
   console.log(`每页 ${val} 条`);
