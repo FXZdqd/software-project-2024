@@ -14,6 +14,12 @@
     @clear="handleClear"
     @keyup.enter="handleSearch"
   ></el-input>
+  <el-button
+    @click.stop="deleteQuestion"
+    type="danger"
+    style="position: relative; left: 53%"
+    ><el-icon><delete /></el-icon>批量删除</el-button
+  >
   <!--el-button type="primary" @click="$emit('searchClick')">搜索</el-button>
   <el-alert>{{ searchText }}</el-alert-->
   <div class="questions-container">
@@ -25,6 +31,7 @@
       max-height="400"
       stripe
       @filter-change="filtchange"
+      @selection-change="selec"
       ><el-table-column type="expand" look="浏览详情">
         <template v-slot="props">
           <el-form class="demo-table-expand" style="margin-right: 15px">
@@ -66,12 +73,12 @@
           scope.row.title
         }}</template></el-table-column
       >
-      <el-table-column label="时间" width="170px">
+      <el-table-column label="时间" width="165px">
         <template v-slot="scope">{{
           formatDate(scope.row.date)
         }}</template></el-table-column
       >
-      <el-table-column label="提问者" width="100px">
+      <el-table-column label="提问者" width="95px">
         <template v-slot="scope">{{
           scope.row.user
         }}</template></el-table-column
@@ -87,7 +94,7 @@
         ]"
         :filter-method="filterTag"
         filter-placement="bottom-end"
-        width="150px"
+        width="170px"
       >
         <template v-slot="scope">
           <el-tag
@@ -100,7 +107,7 @@
           >
         </template>
       </el-table-column>
-      <el-table-column label="" width="110px" align="center"
+      <el-table-column label="" width="108px" align="center"
         ><template #header=""
           ><span
             >被举报次数<el-icon
@@ -111,9 +118,15 @@
       >
       <el-table-column fixed="right" label="操作"
         ><template v-slot="scope">
-          <el-button @click.stop="deleteQuestion(scope.row.q_id)" type="danger">
+          <el-button
+            @click.stop="deleteQuestion(scope.row.q_id)"
+            type="danger"
+            size="small"
+          >
             删除问题<el-icon><delete></delete></el-icon> </el-button></template
       ></el-table-column>
+      <el-table-column type="selection" label="全选" width="30px">
+      </el-table-column>
       <!--el-link icon="el-icon-view" @click.stop :underline="false"<el-tag size="small">
             ><template v-slot="scope">{{ scope.row.views }} 浏览</template></el-link
           >@keyup.enter="handle"
@@ -151,12 +164,14 @@ import {
   GetQuesByKeyword,
   GetQuesByTag,
 } from "@/api/request";
+
 const questions = ref([]);
 const activeNames = ref([]);
 const searchText = ref("");
 const currentPage = ref(1); // 当前页码
 const total = ref(0); // 总条数
 const pageSize = ref(7); // 每页的数据条数
+let valuef = new Set();
 
 onMounted(
   async () => {
@@ -201,7 +216,9 @@ function handleCollapseChange(val) {
 function likeQuestion(id) {
   console.log(`Like question ${id}. (Not implemented)`);
 }
-
+function selec(val) {
+  console.log(val[0].q_id, val);
+}
 const deleteQuestion = (id) => {
   ElMessageBox.confirm("确认删除问题？", "Warning", {
     confirmButtonText: "删除",
@@ -297,6 +314,11 @@ const filtchange = async (filters) => {
   // searchText.value = val;function
   //alert("搜索内容：", searchText.value); /?
   console.log(filters[String(Object.keys(filters))]);
+  for (let i = 0; i < filters[String(Object.keys(filters))].length; i++) {
+    // console.log(typeof filters[String(Object.keys(filters))][i]);
+    valuef.add(filters[String(Object.keys(filters))][i]);
+  }
+
   // const response = await GetQuesByTag(filters[String(Object.keys(filters))]);
   // total.value = response.data.length; //this.$refs.table;
   // if (filters.category.length > 0) {
@@ -307,6 +329,17 @@ const filtchange = async (filters) => {
 };
 
 const filterTag = (value, row) => {
+  let set = new Set(row.tags);
+  valuef.forEach(function (value) {
+    console.log(`${value}`);
+    // if (valuef.has(value)) {
+    set.delete(value);
+    // }
+  });
+  console.log(valuef, set.size, set.size === 0);
+  // if (set.size === 0) {
+  //   return true;
+  // }
   for (var i = 0; i < row.tags.length; i++) {
     if (row.tags[i] === value) {
       return true;

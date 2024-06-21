@@ -74,24 +74,18 @@
           </el-button>
         </template>
         <template v-else>
-          <el-button v-if="scope.row.is_banned" disabled :key="1"
-            >已被封禁</el-button
-          >
           <el-button
-            v-else-if="!scope.row.is_banned"
-            :key="2"
-            type="danger"
-            @click.stop="banuser(scope.row.username)"
-            >封禁 <el-icon style="margin-left: 1px"><delete /></el-icon>
-          </el-button>
-          <!--el-button
-            :type="scope.row.is_banned ? '' : 'danger'"
+            v-if="!scope.row.is_admin"
             :disabled="scope.row.is_banned"
+            :type="scope.row.is_banned ? '' : 'danger'"
             @click.stop="banuser(scope.row.username)"
-            >封禁<el-icon v-if="!scope.row.is_banned"
-              ><delete></delete></el-icon></el-button--></template
-        ></template
-      >
+            >{{ scope.row.is_banned ? "已被" : "" }}封禁<el-icon
+              v-if="!scope.row.is_banned"
+              style="margin-left: 1px"
+              ><delete
+            /></el-icon>
+          </el-button> </template
+      ></template>
     </el-table-column>
   </el-table>
   <!-- 分页器 -->
@@ -208,7 +202,16 @@ const banuser = async (username) => {
     .then(async () => {
       const response = await banUser(username);
       console.log(response.data);
-      this.$forceUpdate();
+      // this.$forceUpdate();
+      const response1 = await getAllUserByReport();
+      console.log(response1.data.users);
+      if (Array.isArray(response1.data.users)) {
+        users.value = response1.data.users.map((user) => ({
+          ...user,
+        }));
+        total.value = users.value.length;
+        tableData.value = users.value;
+      }
     })
     .catch(() => {});
 };
