@@ -220,66 +220,66 @@ class GetQuestionsByTag(APIView):
             return Response({"error": "An error occurred"}, status=500)
 
 
-class GetQuestionByKeyword(APIView):
-    def post(self, request):
-        keyword = request.data.get('keyword')
-        sort_questions_by = request.data.get('sort_questions_by', 'relevance')
-        sort_questions_order = request.data.get('sort_questions_order', 'desc')
-        sort_answers_by = request.data.get('sort_answers_by', 'likes')
-        sort_answers_order = request.data.get('sort_answers_order', 'desc')
-
-        if not keyword:
-            return Response({"error": "Missing 'keyword' parameter."}, status=400)
-
-        question_sort_options = {
-            'likes': 'likes',
-            'date': 'date',
-            'views': 'views',
-            'relevance': 'relevance'
-        }
-        answer_sort_options = {
-            'likes': 'likes',
-            'date': 'date'
-        }
-
-        question_sort_prefix = '' if sort_questions_order == 'asc' else '-'
-        answer_sort_prefix = '' if sort_answers_order == 'asc' else '-'
-
-        questions = Question.objects.filter(
-            Q(title__icontains=keyword) | Q(content__icontains=keyword)
-        )
-
-        if sort_questions_by == 'relevance':
-            questions = questions.annotate(
-                relevance=Case(
-                    When(title__icontains=keyword, then=Value(1)),
-                    default=Value(0),
-                    output_field=IntegerField()
-                )
-            ).order_by(question_sort_prefix + 'relevance')
-        else:
-            questions = questions.order_by(question_sort_prefix + question_sort_options.get(sort_questions_by, 'date'))
-
-        data = [{
-            'q_id': question.id,
-            'title': question.title,
-            'content': question.content,
-            'date': question.date,
-            'likes': question.likes,
-            'views': question.views,
-            'tags': [tag.name for tag in question.tags.all()],
-            'username': question.user.username,
-            'answers': [{
-                'a_id': answer.id,
-                'content': answer.content,
-                'date': answer.date,
-                'likes': answer.likes,
-                'username': answer.user.username
-            } for answer in
-                question.answers.all().order_by(answer_sort_prefix + answer_sort_options.get(sort_answers_by, 'likes'))]
-        } for question in questions]
-
-        return Response(data)
+# class GetQuestionByKeyword(APIView):
+#     def post(self, request):
+#         keyword = request.data.get('keyword')
+#         sort_questions_by = request.data.get('sort_questions_by', 'relevance')
+#         sort_questions_order = request.data.get('sort_questions_order', 'desc')
+#         sort_answers_by = request.data.get('sort_answers_by', 'likes')
+#         sort_answers_order = request.data.get('sort_answers_order', 'desc')
+#
+#         if not keyword:
+#             return Response({"error": "Missing 'keyword' parameter."}, status=400)
+#
+#         question_sort_options = {
+#             'likes': 'likes',
+#             'date': 'date',
+#             'views': 'views',
+#             'relevance': 'relevance'
+#         }
+#         answer_sort_options = {
+#             'likes': 'likes',
+#             'date': 'date'
+#         }
+#
+#         question_sort_prefix = '' if sort_questions_order == 'asc' else '-'
+#         answer_sort_prefix = '' if sort_answers_order == 'asc' else '-'
+#
+#         questions = Question.objects.filter(
+#             Q(title__icontains=keyword) | Q(content__icontains=keyword)
+#         )
+#
+#         if sort_questions_by == 'relevance':
+#             questions = questions.annotate(
+#                 relevance=Case(
+#                     When(title__icontains=keyword, then=Value(1)),
+#                     default=Value(0),
+#                     output_field=IntegerField()
+#                 )
+#             ).order_by(question_sort_prefix + 'relevance')
+#         else:
+#             questions = questions.order_by(question_sort_prefix + question_sort_options.get(sort_questions_by, 'date'))
+#
+#         data = [{
+#             'q_id': question.id,
+#             'title': question.title,
+#             'content': question.content,
+#             'date': question.date,
+#             'likes': question.likes,
+#             'views': question.views,
+#             'tags': [tag.name for tag in question.tags.all()],
+#             'username': question.user.username,
+#             'answers': [{
+#                 'a_id': answer.id,
+#                 'content': answer.content,
+#                 'date': answer.date,
+#                 'likes': answer.likes,
+#                 'username': answer.user.username
+#             } for answer in
+#                 question.answers.all().order_by(answer_sort_prefix + answer_sort_options.get(sort_answers_by, 'likes'))]
+#         } for question in questions]
+#
+#         return Response(data)
 
 
 import base64
