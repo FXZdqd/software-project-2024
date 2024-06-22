@@ -230,6 +230,7 @@ class ReportQuestion(APIView):
             question.reports += 1
             question.user.reports += 1
             question.save()
+            question.user.save()
             return Response({"message": "Question reported successfully."})
         except Question.DoesNotExist:
             return Response({"error": "Question not found."}, status=status.HTTP_404_NOT_FOUND)
